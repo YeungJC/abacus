@@ -1,5 +1,6 @@
-import { Html } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useState } from "react";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { socName, SOCS } from "../data";
 import { useApp } from "../store";
@@ -28,6 +29,8 @@ function Labels() {
   const lang = useApp((s) => s.lang);
   const open = useApp((s) => s.open);
   const go = useApp((s) => s.go);
+  const intro = useApp((s) => s.intro);
+  if (intro) return null;
   return (
     <>
       {STOPS.filter((s) => s.z < z + 1 && s.z > z - 20 && open !== s.id)
@@ -49,19 +52,49 @@ function Labels() {
   );
 }
 
-export default function World() {
+/** Tells the page the street has drawn a few frames, so the loading veil can lift. */
+function Ready({ onReady }: { onReady: () => void }) {
+  const frames = useRef(0);
+  useFrame(() => {
+    frames.current++;
+    if (frames.current === 8) onReady();
+  });
+  return null;
+}
+
+export default function World({ onReady }: { onReady: () => void }) {
   const lang = useApp((s) => s.lang);
+  // drop the reflections and resolution on devices that can't keep up
+  // ?low starts in low quality, for testing on slow machines
+  const startLow = typeof location !== "undefined" && /[?&]low\b/.test(location.search);
+  const [quality, setQuality] = useState<"high" | "low">(startLow ? "low" : "high");
+  const [dpr, setDpr] = useState(startLow ? 1 : 1.6);
   return (
     <Canvas
-      dpr={[1, 1.6]}
-      camera={{ position: [0, 1.65, 17], fov: 62, near: 0.1, far: 160 }}
+      dpr={dpr}
+      camera={{ position: [0, 6.5, 40], fov: 62, near: 0.1, far: 170 }}
       gl={{ antialias: true, powerPreference: "high-performance" }}
-      onCreated={({ gl }) => { gl.domElement.style.touchAction = "none"; }}
+      onCreated={({ gl, scene }) => {
+        gl.domElement.style.touchAction = "none";
+        scene.environmentIntensity = 0.35;
+      }}
     >
+      <PerformanceMonitor
+        onDecline={() => { setDpr(1); setQuality("low"); }}
+        flipflops={2}
+        onFallback={() => { setDpr(1); setQuality("low"); }}
+      />
       <color attach="background" args={["#0b0812"]} />
-      <fog attach="fog" args={["#0b0812", 16, 78]} />
-      <hemisphereLight args={["#47407a", "#1a0e0a", 0.55]} />
-      <Street />
+      <fog attach="fog" args={["#1a0d16", 14, 80]} />
+      <hemisphereLight args={["#47407a", "#1a0e0a", 0.45]} />
+      {/* soft warm reflections for the gold, tiles and wet stone */}
+      <Environment resolution={64} frames={1}>
+        <Lightformer form="rect" color="#ff7a3a" intensity={3} position={[0, 4, -12]} scale={[12, 2, 1]} />
+        <Lightformer form="rect" color="#ff4a2a" intensity={2} position={[-6, 3, 0]} rotation={[0, Math.PI / 2, 0]} scale={[20, 2, 1]} />
+        <Lightformer form="rect" color="#ffb060" intensity={2} position={[6, 3, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[20, 2, 1]} />
+        <Lightformer form="circle" color="#4a4a9a" intensity={0.8} position={[0, 12, 0]} rotation={[Math.PI / 2, 0, 0]} scale={10} />
+      </Environment>
+      <Street quality={quality} />
       <Gate />
       <Halls />
       <EmptyLot lang={lang} />
@@ -72,9 +105,10 @@ export default function World() {
       <GalaStage lang={lang} />
       <Labels />
       <Player />
-      <EffectComposer>
-        <Bloom mipmapBlur luminanceThreshold={0.85} intensity={0.9} radius={0.65} />
-        <Vignette offset={0.25} darkness={0.7} />
+      <Ready onReady={onReady} />
+      <EffectComposer multisampling={quality === "high" ? 4 : 0}>
+        <Bloom mipmapBlur luminanceThreshold={0.8} intensity={1.05} radius={0.7} />
+        <Vignette offset={0.3} darkness={0.75} />
       </EffectComposer>
     </Canvas>
   );

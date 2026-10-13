@@ -8,28 +8,37 @@ import Societies from "./components/Societies";
 import Steps from "./components/Steps";
 import WhatsOn from "./components/WhatsOn";
 import { useApp, useT } from "./store";
+import Help from "./ui/Help";
 import MapStrip from "./ui/MapStrip";
-import Pad from "./ui/Pad";
 import Prompt from "./ui/Prompt";
 import Sheet from "./ui/Sheet";
+import Stick from "./ui/Stick";
 
 const World = lazy(() => import("./world/World"));
 
 /** The whole site as a street you walk down. */
 function Street() {
   const [coarse] = useState(() => matchMedia("(pointer: coarse)").matches);
+  const [ready, setReady] = useState(false);
+  const intro = useApp((s) => s.intro);
+  const lang = useApp((s) => s.lang);
   return (
-    <div className="world">
+    <div className={"world" + (intro ? " intro" : "")}>
       <div className="world-canvas">
-        <Suspense fallback={<div className="world-loading">同</div>}>
-          <World />
+        <Suspense fallback={null}>
+          <World onReady={() => setReady(true)} />
         </Suspense>
+      </div>
+      <div className={"veil" + (ready ? " gone" : "")} aria-hidden={ready}>
+        <div className="veil-tong">同</div>
+        <p>{lang === "en" ? "Lighting the lanterns…" : lang === "hant" ? "點燈中…" : "点灯中…"}</p>
       </div>
       <Header />
       <Prompt />
       <Sheet />
-      {coarse && <Pad />}
+      {coarse && <Stick />}
       <MapStrip />
+      <Help />
     </div>
   );
 }

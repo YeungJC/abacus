@@ -28,6 +28,7 @@ export default function Header() {
   const mode = useApp((s) => s.mode);
   const narrow = typeof window !== "undefined" && window.innerWidth < 560;
   const setMode = useApp((s) => s.setMode);
+  const setHelp = useApp((s) => s.setHelp);
   const sound = useApp((s) => s.sound);
   const setSound = useApp((s) => s.setSound);
   const [dark, setDark] = useState(() => {
@@ -69,18 +70,23 @@ export default function Header() {
           <button
             className="icon-btn"
             aria-pressed={sound}
-            title="Lantern chimes (pentatonic 五音)"
+            title={sound ? "Sound on: lantern chimes" : "Sound off"}
+            aria-label={sound ? "Turn sound off" : "Turn sound on"}
             onClick={() => {
               const on = !sound && enableSound();
               setSound(on);
               if (on) setTimeout(() => pluck(3), 0);
             }}
-          >五音</button>
-          <button
-            className="icon-btn"
-            title={dark ? "Switch to day" : "Switch to lantern night"}
-            onClick={() => { document.documentElement.dataset.theme = dark ? "light" : "dark"; setDark(!dark); }}
-          >{dark ? "晝" : "夜"}</button>
+          >{sound ? "♪ 五音" : "五音"}</button>
+          {mode === "world" ? (
+            <button className="icon-btn help-btn" title={lang === "en" ? "How to get around" : "點樣行"} aria-label="How to get around" onClick={() => setHelp(true)}>?</button>
+          ) : (
+            <button
+              className="icon-btn"
+              title={dark ? "Switch to day" : "Switch to lantern night"}
+              onClick={() => { document.documentElement.dataset.theme = dark ? "light" : "dark"; setDark(!dark); }}
+            >{dark ? "晝" : "夜"}</button>
+          )}
         </div>
       </div>
     </header>

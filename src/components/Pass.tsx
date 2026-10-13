@@ -52,7 +52,7 @@ export default function Pass() {
           <div><h2>{t("pass.h")}</h2><p>{t("pass.p")}</p></div>
         </div>
         <div className="pass-grid">
-          <div className="envelope-stage">
+          <div className={"envelope-stage" + (open ? " is-open" : "")}>
             <button className={"envelope" + (open ? " open" : "")} aria-label={open ? "Close the red envelope" : "Open the red envelope"} onClick={() => { setOpen(!open); pluck(open ? 1 : 4); }}>
               <div className="env-back" />
               <div className="pass-card">

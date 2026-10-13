@@ -18,12 +18,13 @@ export default function MapStrip() {
   const lang = useApp((s) => s.lang);
   const near = useApp((s) => s.near);
   const go = useApp((s) => s.go);
+  const step = useApp((s) => s.step);
   const nav = useRef<HTMLElement>(null);
   // keep the station you're at in view when the line is wider than the screen
   useEffect(() => {
     const el = nav.current?.querySelector(".map-stop.here") as HTMLElement | null;
     if (el && nav.current && nav.current.scrollWidth > nav.current.clientWidth) {
-      nav.current.scrollTo({ left: el.offsetLeft - nav.current.clientWidth / 2, behavior: "smooth" });
+      nav.current.scrollTo({ left: el.offsetLeft + (el.parentElement?.offsetLeft ?? 0) - nav.current.clientWidth / 2, behavior: "smooth" });
     }
   }, [near]);
   const n = STOPS.length;
@@ -36,6 +37,8 @@ export default function MapStrip() {
   }
   const pct = (i: number) => `${(i / (n - 1)) * 100}%`;
   return (
+    <div className="map-bar">
+    <button className="map-step" onClick={() => step(-1)} aria-label={lang === "en" ? "Previous place" : "上一站"} title={lang === "en" ? "Previous place  [" : "上一站"}>‹</button>
     <nav className="map" aria-label="Places on the street" ref={nav}>
       <div className="map-line">
         <div className="map-track" />
@@ -51,5 +54,7 @@ export default function MapStrip() {
         })}
       </div>
     </nav>
+    <button className="map-step" onClick={() => step(1)} aria-label={lang === "en" ? "Next place" : "下一站"} title={lang === "en" ? "Next place  ]" : "下一站"}>›</button>
+    </div>
   );
 }

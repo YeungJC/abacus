@@ -1,24 +1,189 @@
 import { MeshReflectorMaterial } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { useApp } from "../store";
 import { lanternGeo } from "./Lantern";
-import Shophouse from "./Shophouse";
+import { walkToPoint } from "./Player";
+import { buildRow, type Spec } from "./Shophouse";
 import { HALF, STOPS } from "./stops";
-import { canvasTex, flagstoneTex, lanternTex, neonTex, rng } from "./textures";
+import { canvasTex, flagstoneTex, haloTex, lanternTex, neonTex, puddleTex, rng } from "./textures";
 
-const WALLS = ["#4a2420", "#3e3a30", "#2f3b36", "#463424", "#3a2a32", "#2e2a28", "#4e3a28"];
-const SIGNS = ["粥麵", "燒臘", "麻雀", "點心", "糖水", "裁縫", "金行", "雲吞", "藥材", "書局", "茶餐廳", "海味"];
+const WALLS = ["#4a2420", "#3e3a30", "#2f3b36", "#463424", "#3a2a32", "#2e2a28", "#4e3a28", "#3a3a44"];
+const SIGNS = ["粥麵", "燒臘", "麻雀", "點心", "糖水", "裁縫", "金行", "雲吞", "藥材", "書局", "茶餐廳", "海味", "涼茶", "髮型"];
 const NEON = ["#ff4a3d", "#3fe0a8", "#ffc24a", "#ff6fae", "#7fb3ff", "#ffffff"];
 
-const Z_FROM = 25, Z_TO = -45;
+const Z_FROM = 26, Z_TO = -45;
+const STREET_LEN = 86, STREET_MID = -14;
 
-/** Shophouses that fill the street between the places you can visit. */
+/* ── sky ─────────────────────────────────────────── */
+
+/** A rainy city night: low cloud lit orange from below, darker overhead. */
+function Sky() {
+  const mat = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        depthWrite: false,
+        fog: false,
+        uniforms: { uTime: { value: 0 } },
+        vertexShader: /* glsl */ `
+          varying vec3 vDir;
+          void main() {
+            vDir = normalize(position);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }`,
+        fragmentShader: /* glsl */ `
+          varying vec3 vDir;
+          uniform float uTime;
+          float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+          float noise(vec2 p) {
+            vec2 i = floor(p), f = fract(p);
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
+          }
+          float fbm(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; } return v; }
+          void main() {
+            float h = clamp(vDir.y, -0.1, 1.0);
+            vec3 zenith = vec3(0.025, 0.02, 0.05);
+            vec3 horizon = vec3(0.22, 0.09, 0.11);
+            vec3 col = mix(horizon, zenith, pow(smoothstep(0.0, 0.55, h), 0.7));
+            // cloud deck, lit by the city
+            vec2 uv = vDir.xz / max(vDir.y + 0.25, 0.08) * 1.4 + vec2(uTime * 0.006, uTime * 0.01);
+            float c = fbm(uv);
+            col += vec3(0.16, 0.07, 0.07) * smoothstep(0.45, 0.85, c) * (1.0 - smoothstep(0.1, 0.8, h));
+            col += vec3(0.04, 0.03, 0.06) * smoothstep(0.5, 0.9, c);
+            gl_FragColor = vec4(col, 1.0);
+          }`,
+      }),
+    [],
+  );
+  const mesh = useRef<THREE.Mesh>(null!);
+  useFrame(({ camera }, dt) => {
+    mat.uniforms.uTime.value += dt;
+    mesh.current.position.copy(camera.position);
+  });
+  return (
+    <mesh ref={mesh} material={mat} scale={150} raycast={() => null} renderOrder={-1}>
+      <sphereGeometry args={[1, 32, 16]} />
+    </mesh>
+  );
+}
+
+function Moon() {
+  return (
+    <group position={[22, 52, -140]}>
+      <mesh raycast={() => null}><circleGeometry args={[3.4, 48]} /><meshBasicMaterial color="#f8ecd0" fog={false} toneMapped={false} /></mesh>
+      <sprite scale={[30, 30, 1]} position={[0, 0, -0.5]} raycast={() => null}>
+        <spriteMaterial map={haloTex()} color="#ffe9c4" transparent opacity={0.35} depthWrite={false} fog={false} blending={THREE.AdditiveBlending} />
+      </sprite>
+    </group>
+  );
+}
+
+/* ── the street surface ──────────────────────────── */
+
+/** Wet granite with puddles that mirror the lanterns. Click it to walk there. */
+function Ground({ quality }: { quality: "high" | "low" }) {
+  const map = useMemo(() => { const t = flagstoneTex(); t.repeat.set(2, 18); return t; }, []);
+  const rough = useMemo(() => { const t = puddleTex(); t.repeat.set(1, 4); return t; }, []);
+  const cursor = useRef<THREE.Mesh>(null!);
+  const move = (e: ThreeEvent<PointerEvent>) => {
+    if (e.pointerType !== "mouse") return;
+    cursor.current.visible = true;
+    cursor.current.position.set(e.point.x, 0.02, e.point.z);
+  };
+  const click = (e: ThreeEvent<MouseEvent>) => {
+    if (e.delta > 6) return;
+    e.stopPropagation();
+    walkToPoint(e.point.x, e.point.z);
+  };
+  return (
+    <>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, STREET_MID]} onPointerMove={move} onPointerOut={() => (cursor.current.visible = false)} onClick={click}>
+        <planeGeometry args={[HALF * 2, STREET_LEN]} />
+        {quality === "high" ? (
+          <MeshReflectorMaterial
+            map={map}
+            roughnessMap={rough}
+            blur={[160, 40]}
+            resolution={512}
+            mixBlur={0.8}
+            mixStrength={7}
+            mirror={0.9}
+            roughness={0.9}
+            depthScale={0.5}
+            minDepthThreshold={0.3}
+            maxDepthThreshold={1.2}
+            color="#8a8084"
+            metalness={0.4}
+          />
+        ) : (
+          <meshStandardMaterial map={map} roughness={0.42} metalness={0.25} color="#9a8e90" />
+        )}
+      </mesh>
+      {/* where a click will take you */}
+      <mesh ref={cursor} rotation={[-Math.PI / 2, 0, 0]} visible={false} raycast={() => null}>
+        <ringGeometry args={[0.26, 0.34, 40]} />
+        <meshBasicMaterial color="#f6cf6e" transparent opacity={0.85} toneMapped={false} depthWrite={false} />
+      </mesh>
+      {/* kerbs and pavement */}
+      {[-1, 1].map((s) => (
+        <group key={s}>
+          <mesh position={[s * (HALF - 0.35), 0.06, STREET_MID]} raycast={() => null}>
+            <boxGeometry args={[0.7, 0.12, STREET_LEN]} />
+            <meshStandardMaterial color="#4a4446" roughness={0.5} metalness={0.2} />
+          </mesh>
+          <mesh position={[s * (HALF - 0.71), 0.07, STREET_MID]} raycast={() => null}>
+            <boxGeometry args={[0.06, 0.14, STREET_LEN]} />
+            <meshStandardMaterial color="#7a7070" roughness={0.4} />
+          </mesh>
+        </group>
+      ))}
+    </>
+  );
+}
+
+/** Raindrops landing in the puddles around you. */
+function Ripples() {
+  const N = 140;
+  const inst = useRef<THREE.InstancedMesh>(null!);
+  const drops = useMemo(() => {
+    const r = rng(17);
+    return Array.from({ length: N }, () => ({ x: (r() - 0.5) * (HALF * 2 - 1.6), z: 17 - r() * 22, t: r() }));
+  }, []);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const col = useMemo(() => new THREE.Color(), []);
+  useFrame(({ camera }, dt) => {
+    drops.forEach((d, i) => {
+      d.t += Math.min(dt, 0.05) * 1.6;
+      if (d.t > 1) { d.t -= 1; d.x = (Math.random() - 0.5) * (HALF * 2 - 1.6); d.z = camera.position.z - 1 - Math.random() * 22; }
+      dummy.position.set(d.x, 0.015, d.z);
+      dummy.rotation.set(-Math.PI / 2, 0, 0);
+      dummy.scale.setScalar(0.03 + d.t * 0.2);
+      dummy.updateMatrix();
+      inst.current.setMatrixAt(i, dummy.matrix);
+      inst.current.setColorAt(i, col.setScalar((1 - d.t) * (1 - d.t) * 0.4));
+    });
+    inst.current.instanceMatrix.needsUpdate = true;
+    if (inst.current.instanceColor) inst.current.instanceColor.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={inst} args={[undefined, undefined, N]} raycast={() => null} frustumCulled={false}>
+      <ringGeometry args={[0.8, 1, 24]} />
+      <meshBasicMaterial color="#c8d6ff" transparent blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+    </instancedMesh>
+  );
+}
+
+/* ── buildings that fill the street ───────────────── */
+
 function Filler() {
-  const items = useMemo(() => {
+  const { row, blades } = useMemo(() => {
     const r = rng(5);
-    const out: JSX.Element[] = [];
+    const specs: Spec[] = [];
+    const blades: { text: string; col: string; flicker: boolean; position: [number, number, number] }[] = [];
     let n = 0;
     for (const side of [-1, 1] as const) {
       const taken = STOPS.filter((s) => s.side === side).map((s) => [s.z + s.w / 2, s.z - s.w / 2]);
@@ -32,34 +197,62 @@ function Filler() {
         if (w < 0.6) { z -= w; continue; }
         const cz = z - w / 2;
         const floors = 2 + Math.floor(r() * 3);
-        out.push(<Shophouse key={`f${n}`} side={side} z={cz} w={w} floors={floors} wall={WALLS[n % WALLS.length]} seed={200 + n} awning={r() > 0.5 ? (r() > 0.5 ? "#7a2018" : "#24463f") : undefined} interior={r() > 0.3 ? "#ffb067" : "#ffd6a0"} />);
-        if (w > 2.4 && r() > 0.3) {
-          const col = NEON[n % NEON.length];
-          out.push(<NeonBlade key={`n${n}`} text={SIGNS[n % SIGNS.length]} col={col} position={[side * (HALF - 0.55), 3.6 + r() * 1.6, cz + (r() - 0.5) * (w - 1)]} />);
+        specs.push({
+          side, z: cz, w, floors,
+          wall: WALLS[n % WALLS.length],
+          seed: 200 + n,
+          awning: r() > 0.5 ? (r() > 0.5 ? "#7a2018" : "#24463f") : undefined,
+          interior: r() > 0.3 ? "#ffb067" : "#ffd6a0",
+          closed: r() > 0.72,
+          laundry: floors > 2 && r() > 0.45,
+        });
+        if (w > 2.4 && r() > 0.25) {
+          blades.push({ text: SIGNS[n % SIGNS.length], col: NEON[n % NEON.length], flicker: r() > 0.85, position: [side * (HALF - 0.55), 3.6 + r() * 1.6, cz + (r() - 0.5) * (w - 1)] });
         }
         n++;
         z -= w;
       }
     }
-    return out;
+    return { row: buildRow(specs), blades };
   }, []);
-  return <>{items}</>;
-}
-
-function NeonBlade({ text, col, position }: { text: string; col: string; position: [number, number, number] }) {
-  const tex = useMemo(() => neonTex(text, col), [text, col]);
-  const h = 0.45 * [...text].length + 0.3;
   return (
-    <mesh position={position}>
-      <planeGeometry args={[0.5, h]} />
-      <meshBasicMaterial map={tex} toneMapped={false} side={THREE.DoubleSide} />
-    </mesh>
+    <>
+      {row.map((m) => <mesh key={m.key} geometry={m.geo} material={m.material} raycast={() => null} />)}
+      {blades.map((b, i) => <NeonBlade key={i} {...b} />)}
+    </>
   );
 }
 
-/** Strings of 福 lanterns across the street. */
+/** A neon blade sign sticking out over the pavement; a few of them flicker. */
+function NeonBlade({ text, col, position, flicker }: { text: string; col: string; position: [number, number, number]; flicker?: boolean }) {
+  const tex = useMemo(() => neonTex(text, col), [text, col]);
+  const mat = useRef<THREE.MeshBasicMaterial>(null!);
+  const glow = useRef<THREE.SpriteMaterial>(null!);
+  useFrame(({ clock }) => {
+    if (!flicker) return;
+    const t = clock.elapsedTime;
+    const on = Math.sin(t * 13) + Math.sin(t * 3.1) > -1.4 ? 1 : 0.25;
+    mat.current.color.setScalar(on);
+    glow.current.opacity = 0.3 * on;
+  });
+  const h = 0.45 * [...text].length + 0.3;
+  return (
+    <group position={position}>
+      <mesh raycast={() => null}>
+        <planeGeometry args={[0.5, h]} />
+        <meshBasicMaterial ref={mat} map={tex} toneMapped={false} side={THREE.DoubleSide} />
+      </mesh>
+      <sprite scale={[1.8, h + 1.4, 1]} raycast={() => null}>
+        <spriteMaterial ref={glow} map={haloTex()} color={col} transparent opacity={0.3} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+      </sprite>
+    </group>
+  );
+}
+
+/* ── lanterns strung across the street ────────────── */
+
 function LanternStrings() {
-  const { geo, items } = useMemo(() => {
+  const { geo, items, haloGeo } = useMemo(() => {
     const pts: number[] = [];
     const items: { x: number; y: number; z: number; ph: number }[] = [];
     for (let z = 5; z > -44; z -= 4.6) {
@@ -75,7 +268,9 @@ function LanternStrings() {
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-    return { geo, items };
+    const haloGeo = new THREE.BufferGeometry();
+    haloGeo.setAttribute("position", new THREE.Float32BufferAttribute(items.flatMap((l) => [l.x, l.y - 0.1, l.z]), 3));
+    return { geo, items, haloGeo };
   }, []);
   const tex = useMemo(() => lanternTex("福", "#d8321e"), []);
   const inst = useRef<THREE.InstancedMesh>(null!);
@@ -93,31 +288,38 @@ function LanternStrings() {
     inst.current.instanceMatrix.needsUpdate = true;
   });
   return (
-    <>
-      <lineSegments geometry={geo}><lineBasicMaterial color="#2a1e1a" /></lineSegments>
-      <instancedMesh ref={inst} args={[lanternGeo, undefined, items.length]}>
+    <group>
+      <lineSegments geometry={geo} raycast={() => null}><lineBasicMaterial color="#2a1e1a" /></lineSegments>
+      <instancedMesh ref={inst} args={[lanternGeo, undefined, items.length]} raycast={() => null}>
         <meshStandardMaterial map={tex} emissive="#ffffff" emissiveMap={tex} emissiveIntensity={1.5} />
       </instancedMesh>
-    </>
+      <points geometry={haloGeo} raycast={() => null}>
+        <pointsMaterial map={haloTex()} color="#ff5a30" size={1.5} sizeAttenuation transparent opacity={0.5} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+      </points>
+    </group>
   );
 }
 
-/** Manchester drizzle. */
+/* ── weather and sky ─────────────────────────────── */
+
 function Rain() {
-  const N = 1400;
+  const N = 1500;
+  const group = useRef<THREE.Group>(null!);
   const { geo, speed } = useMemo(() => {
     const r = rng(3);
     const p = new Float32Array(N * 6), speed = new Float32Array(N);
     for (let i = 0; i < N; i++) {
-      const x = (r() - 0.5) * 10, y = r() * 10, z = 22 - r() * 70;
-      p.set([x, y, z, x + 0.015, y - 0.28, z], i * 6);
+      const x = (r() - 0.5) * 10, y = r() * 10, z = 10 - r() * 34;
+      p.set([x, y, z, x + 0.015, y - 0.3, z], i * 6);
       speed[i] = 7 + r() * 4;
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(p, 3));
     return { geo, speed };
   }, []);
-  useFrame((_, dt) => {
+  useFrame(({ camera }, dt) => {
+    // the rain moves with you, so 1,500 drops cover the whole street
+    group.current.position.z = camera.position.z - 8;
     const a = geo.attributes.position as THREE.BufferAttribute;
     const p = a.array as Float32Array;
     const d = Math.min(dt, 0.05);
@@ -129,60 +331,63 @@ function Rain() {
     a.needsUpdate = true;
   });
   return (
-    <lineSegments geometry={geo}>
-      <lineBasicMaterial color="#a9bedc" transparent opacity={0.22} depthWrite={false} />
-    </lineSegments>
-  );
-}
-
-/** Sky lanterns drifting up over the gala end of the street. */
-function SkyLanterns() {
-  const N = 40;
-  const inst = useRef<THREE.InstancedMesh>(null!);
-  const seeds = useMemo(() => { const r = rng(9); return Array.from({ length: N }, () => [(r() - 0.5) * 30, r() * 30, -50 - r() * 40, 0.3 + r() * 0.4, r() * 6]); }, []);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime;
-    seeds.forEach(([x, y0, z, v, ph], i) => {
-      const y = 8 + ((y0 + t * v) % 30);
-      dummy.position.set(x + Math.sin(t * 0.3 + ph) * 0.8, y, z);
-      dummy.scale.setScalar(0.5);
-      dummy.updateMatrix();
-      inst.current.setMatrixAt(i, dummy.matrix);
-    });
-    inst.current.instanceMatrix.needsUpdate = true;
-  });
-  return (
-    <instancedMesh ref={inst} args={[undefined, undefined, N]}>
-      <cylinderGeometry args={[0.4, 0.3, 0.7, 6]} />
-      <meshBasicMaterial color="#ffb45a" toneMapped={false} fog={false} />
-    </instancedMesh>
-  );
-}
-
-function Moon() {
-  const halo = useMemo(
-    () =>
-      canvasTex(256, 256, (c) => {
-        const g = c.createRadialGradient(128, 128, 30, 128, 128, 128);
-        g.addColorStop(0, "rgba(255,240,210,.55)"); g.addColorStop(1, "rgba(255,240,210,0)");
-        c.fillStyle = g; c.fillRect(0, 0, 256, 256);
-      }),
-    [],
-  );
-  return (
-    <group position={[16, 46, -140]}>
-      <mesh><circleGeometry args={[3.6, 48]} /><meshBasicMaterial color="#f6e7c4" fog={false} toneMapped={false} /></mesh>
-      <mesh position={[0, 0, -0.1]}><planeGeometry args={[24, 24]} /><meshBasicMaterial map={halo} transparent fog={false} depthWrite={false} /></mesh>
+    <group ref={group}>
+      <lineSegments geometry={geo} raycast={() => null} frustumCulled={false}>
+        <lineBasicMaterial color="#b4c6e6" transparent opacity={0.26} depthWrite={false} />
+      </lineSegments>
     </group>
   );
 }
 
-/** Firecracker bursts in the sky above the stage. */
+/** 孔明燈: paper sky lanterns drifting up over the far end of the street. */
+function SkyLanterns() {
+  const N = 46;
+  const inst = useRef<THREE.InstancedMesh>(null!);
+  const seeds = useMemo(() => { const r = rng(9); return Array.from({ length: N }, () => [(r() - 0.5) * 40, r() * 40, -48 - r() * 60, 0.25 + r() * 0.35, r() * 6]); }, []);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const pos = useMemo(() => new Float32Array(N * 3), []);
+  const glowGeo = useMemo(() => { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); return g; }, [pos]);
+  const tex = useMemo(
+    () =>
+      canvasTex(64, 64, (c) => {
+        const g = c.createLinearGradient(0, 0, 0, 64);
+        g.addColorStop(0, "#ffcf7a"); g.addColorStop(1, "#ff7a2a");
+        c.fillStyle = g; c.fillRect(0, 0, 64, 64);
+      }),
+    [],
+  );
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    seeds.forEach(([x, y0, z, v, ph], i) => {
+      const y = 9 + ((y0 + t * v) % 40);
+      const px = x + Math.sin(t * 0.25 + ph) * 1.2;
+      dummy.position.set(px, y, z);
+      dummy.rotation.set(0, ph, Math.sin(t * 0.5 + ph) * 0.08);
+      dummy.scale.set(0.55, 0.7, 0.55);
+      dummy.updateMatrix();
+      inst.current.setMatrixAt(i, dummy.matrix);
+      pos.set([px, y, z], i * 3);
+    });
+    inst.current.instanceMatrix.needsUpdate = true;
+    glowGeo.attributes.position.needsUpdate = true;
+  });
+  return (
+    <group>
+      <instancedMesh ref={inst} args={[undefined, undefined, N]} raycast={() => null} frustumCulled={false}>
+        <cylinderGeometry args={[0.45, 0.32, 0.9, 8, 1, true]} />
+        <meshBasicMaterial map={tex} toneMapped={false} fog={false} side={THREE.DoubleSide} />
+      </instancedMesh>
+      <points geometry={glowGeo} raycast={() => null} frustumCulled={false}>
+        <pointsMaterial map={haloTex()} color="#ff9a40" size={3.2} transparent opacity={0.45} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} fog={false} />
+      </points>
+    </group>
+  );
+}
+
+/** Firecracker bursts over the stage: soft sparks with gravity that twinkle as they die. */
 function Fireworks() {
-  const N = 2400;
-  const pts = useRef<THREE.Points>(null!);
-  const state = useMemo(() => ({ pos: new Float32Array(N * 3), vel: new Float32Array(N * 3), life: new Float32Array(N), col: new Float32Array(N * 3), next: 0 }), []);
+  const N = 3000;
+  const state = useMemo(() => ({ pos: new Float32Array(N * 3), vel: new Float32Array(N * 3), life: new Float32Array(N), col: new Float32Array(N * 3), base: new Float32Array(N * 3), next: 0 }), []);
   const geo = useMemo(() => {
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(state.pos, 3));
@@ -192,90 +397,131 @@ function Fireworks() {
   const count = useApp((s) => s.fireworks);
   useEffect(() => {
     if (!count) return;
-    const palette = [[1, 0.3, 0.2], [1, 0.82, 0.35], [1, 0.55, 0.25], [1, 0.95, 0.8]];
-    for (let b = 0; b < 5; b++) {
-      setTimeout(() => {
-        const cx = (Math.random() - 0.5) * 9, cy = 8.5 + Math.random() * 4, cz = -52 + Math.random() * 5;
+    const palette = [[1, 0.25, 0.15], [1, 0.8, 0.3], [1, 0.5, 0.2], [1, 0.95, 0.85], [0.95, 0.35, 0.55]];
+    const timers: number[] = [];
+    for (let b = 0; b < 6; b++) {
+      timers.push(window.setTimeout(() => {
+        const cx = (Math.random() - 0.5) * 9, cy = 9 + Math.random() * 4.5, cz = -53 + Math.random() * 5;
         const col = palette[b % palette.length];
-        for (let k = 0; k < 320; k++) {
+        const ring = b % 3 === 2; // every third burst is a flat ring
+        for (let k = 0; k < 420; k++) {
           const i = state.next; state.next = (state.next + 1) % N;
-          const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, sp = 4 + Math.random() * 3;
-          const s = Math.sqrt(1 - u * u);
+          let vx, vy, vz;
+          if (ring) { const th = (k / 420) * Math.PI * 2; vx = Math.cos(th); vy = Math.sin(th); vz = (Math.random() - 0.5) * 0.15; }
+          else { const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u); vx = s * Math.cos(th); vy = u; vz = s * Math.sin(th); }
+          const sp = 4.5 + Math.random() * 1.6;
           state.pos.set([cx, cy, cz], i * 3);
-          state.vel.set([s * Math.cos(th) * sp, u * sp, s * Math.sin(th) * sp], i * 3);
-          state.col.set(col, i * 3);
-          state.life[i] = 1.6 + Math.random() * 0.6;
+          state.vel.set([vx * sp, vy * sp, vz * sp], i * 3);
+          state.base.set(col, i * 3);
+          state.life[i] = 1.4 + Math.random() * 0.8;
         }
-      }, b * 260);
+      }, b * 300));
     }
+    return () => timers.forEach(clearTimeout);
   }, [count, state]);
   useFrame((_, dt) => {
     const d = Math.min(dt, 0.05);
-    let any = false;
     for (let i = 0; i < N; i++) {
       if (state.life[i] <= 0) { state.pos[i * 3 + 1] = -100; continue; }
-      any = true;
       state.life[i] -= d;
-      state.vel[i * 3 + 1] -= 3 * d;
-      for (let k = 0; k < 3; k++) { state.vel[i * 3 + k] *= 0.985; state.pos[i * 3 + k] += state.vel[i * 3 + k] * d; }
-      const f = Math.max(0, Math.min(1, state.life[i]));
-      state.col[i * 3] *= 0.995; state.col[i * 3 + 1] *= 0.99 + 0.005 * f; state.col[i * 3 + 2] *= 0.98;
+      state.vel[i * 3 + 1] -= 2.6 * d;
+      for (let k = 0; k < 3; k++) { state.vel[i * 3 + k] *= 1 - 1.3 * d; state.pos[i * 3 + k] += state.vel[i * 3 + k] * d; }
+      const f = Math.min(1, state.life[i]) * (state.life[i] < 0.5 ? (Math.random() > 0.5 ? 1 : 0.2) : 1);
+      for (let k = 0; k < 3; k++) state.col[i * 3 + k] = state.base[i * 3 + k] * f;
     }
-    if (any || count) { geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true; }
+    geo.attributes.position.needsUpdate = true;
+    geo.attributes.color.needsUpdate = true;
   });
   return (
-    <points ref={pts} geometry={geo} frustumCulled={false}>
-      <pointsMaterial size={0.22} vertexColors toneMapped={false} transparent depthWrite={false} blending={THREE.AdditiveBlending} fog={false} />
+    <points geometry={geo} frustumCulled={false} raycast={() => null}>
+      <pointsMaterial map={haloTex()} size={0.55} vertexColors toneMapped={false} transparent depthWrite={false} blending={THREE.AdditiveBlending} fog={false} />
     </points>
   );
 }
 
-/** Wet granite street that mirrors the lanterns, with kerbs either side. */
-function Ground() {
-  const map = useMemo(() => { const t = flagstoneTex(); t.repeat.set(2, 16); return t; }, []);
-  const small = useThree((s) => s.size.width < 700);
+/* ── people out in the rain ──────────────────────── */
+
+const COATS = ["#1e2430", "#3a2a24", "#2a3a34", "#4a2a2a", "#2a2a2e", "#5a4a3a"];
+const BROLLIES = ["#c4291e", "#1f3d6b", "#e0b84a", "#2f6e63", "#2a2a2e", "#d6688a", "#f2efe6"];
+
+function Pedestrians() {
+  const N = 12;
+  const people = useMemo(() => {
+    const r = rng(33);
+    return Array.from({ length: N }, (_, i) => ({
+      x: (r() < 0.5 ? -1 : 1) * (0.9 + r() * 2),
+      z: Z_FROM - 4 - r() * 62,
+      dir: r() < 0.5 ? 1 : -1,
+      speed: 0.7 + r() * 0.6,
+      ph: r() * 6,
+      coat: new THREE.Color(COATS[i % COATS.length]),
+      brolly: new THREE.Color(BROLLIES[(i * 3) % BROLLIES.length]),
+      h: 0.92 + r() * 0.16,
+    }));
+  }, []);
+  // one instanced mesh per body part, so twelve people cost five draw calls
+  const kit = useMemo(() => ({
+    body: [new THREE.CapsuleGeometry(0.2, 0.75, 4, 10).translate(0, 0.82, 0), new THREE.MeshStandardMaterial({ roughness: 0.8 })] as const,
+    head: [new THREE.SphereGeometry(0.13, 12, 10).translate(0, 1.5, 0), new THREE.MeshStandardMaterial({ color: "#2a1e18", roughness: 0.6 })] as const,
+    legs: [mergeLegs(), new THREE.MeshStandardMaterial({ color: "#141418" })] as const,
+    stick: [new THREE.CylinderGeometry(0.012, 0.012, 0.75).translate(0.1, 1.55, -0.05), new THREE.MeshStandardMaterial({ color: "#222" })] as const,
+    brolly: [new THREE.ConeGeometry(0.62, 0.26, 10, 1, true).translate(0.1, 1.95, -0.05), new THREE.MeshStandardMaterial({ roughness: 0.35, side: THREE.DoubleSide })] as const,
+  }), []);
+  const refs = useRef<Record<string, THREE.InstancedMesh>>({});
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  useEffect(() => {
+    people.forEach((p, i) => {
+      refs.current.body?.setColorAt(i, p.coat);
+      refs.current.brolly?.setColorAt(i, p.brolly);
+    });
+    for (const k of ["body", "brolly"]) if (refs.current[k]?.instanceColor) refs.current[k].instanceColor!.needsUpdate = true;
+  }, [people]);
+  useFrame(({ clock }, dt) => {
+    const t = clock.elapsedTime;
+    people.forEach((p, i) => {
+      // dir 1 walks down the street (-z), -1 walks back up; turn round before the stage and the end
+      p.z -= p.dir * p.speed * Math.min(dt, 0.05);
+      if (p.z < -41) p.dir = -1;
+      if (p.z > Z_FROM - 2) p.dir = 1;
+      dummy.position.set(p.x, Math.abs(Math.sin(t * 5 * p.speed + p.ph)) * 0.03, p.z);
+      dummy.rotation.set(0, p.dir === 1 ? 0 : Math.PI, Math.sin(t * 5 * p.speed + p.ph) * 0.03);
+      dummy.scale.setScalar(p.h);
+      dummy.updateMatrix();
+      for (const k of Object.keys(kit)) refs.current[k]?.setMatrixAt(i, dummy.matrix);
+    });
+    for (const k of Object.keys(kit)) if (refs.current[k]) refs.current[k].instanceMatrix.needsUpdate = true;
+  });
   return (
     <>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -14]}>
-        <planeGeometry args={[HALF * 2, 84]} />
-        <MeshReflectorMaterial
-          map={map}
-          blur={[200, 60]}
-          resolution={small ? 256 : 512}
-          mixBlur={1}
-          mixStrength={small ? 6 : 9}
-          mirror={0.85}
-          roughness={0.55}
-          depthScale={0.6}
-          minDepthThreshold={0.3}
-          maxDepthThreshold={1.2}
-          color="#8a8084"
-          metalness={0.35}
-        />
-      </mesh>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * (HALF - 0.35), 0.06, -14]}>
-          <boxGeometry args={[0.7, 0.12, 84]} />
-          <meshStandardMaterial color="#4a4446" roughness={0.6} />
-        </mesh>
+      {Object.entries(kit).map(([k, [geo, material]]) => (
+        <instancedMesh key={k} ref={(m) => { if (m) refs.current[k] = m; }} args={[geo, material, N]} raycast={() => null} frustumCulled={false} />
       ))}
     </>
   );
 }
 
-export default function Street() {
+function mergeLegs() {
+  const a = new THREE.CapsuleGeometry(0.065, 0.3, 3, 6).translate(-0.09, 0.22, 0);
+  const b = new THREE.CapsuleGeometry(0.065, 0.3, 3, 6).translate(0.09, 0.22, 0);
+  return mergeGeometries([a, b])!;
+}
+
+export default function Street({ quality }: { quality: "high" | "low" }) {
   return (
     <>
-      <Ground />
+      <Sky />
+      <Moon />
+      <Ground quality={quality} />
+      <Ripples />
       <Filler />
       <LanternStrings />
       <Rain />
       <SkyLanterns />
-      <Moon />
       <Fireworks />
+      <Pedestrians />
       {/* lantern light pooling on the street, every ten metres */}
-      {[14, 4, -6, -16, -26, -36].map((z, i) => (
-        <pointLight key={z} position={[i % 2 ? 1.5 : -1.5, 4.8, z]} color="#ff8a50" intensity={55} distance={15} decay={2} />
+      {[12, -2, -16, -30].map((z, i) => (
+        <pointLight key={z} position={[i % 2 ? 1.2 : -1.2, 5, z]} color="#ff8a50" intensity={80} distance={19} decay={2} />
       ))}
     </>
   );

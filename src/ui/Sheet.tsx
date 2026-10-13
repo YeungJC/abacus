@@ -10,18 +10,10 @@ import WhatsOn, { Gala } from "../components/WhatsOn";
 import { placeName } from "../world/World";
 import { STOPS, stopById, type StopId } from "../world/stops";
 
-const coarse = () => matchMedia("(pointer: coarse)").matches;
-
 function Welcome() {
   const { t, lang } = useT();
   const go = useApp((s) => s.go);
-  const how = {
-    en: coarse()
-      ? ["Drag the street to look around.", "Hold ▲ to walk, ◀ ▶ to turn.", "Tap a name tag or a station on the line below to walk there."]
-      : ["W A S D or the arrow keys to walk. Hold Shift to hurry.", "Drag to look around. Scroll to stroll.", "Click a shop, a name tag or a station on the line below to walk there."],
-    hant: coarse() ? ["拖動街景四圍望。", "按住 ▲ 行，◀ ▶ 轉身。", "撳名牌或者下面路線圖嘅站就會行過去。"] : ["W A S D 或方向鍵行路，按住 Shift 行快啲。", "拖動滑鼠四圍望，碌滑鼠慢慢行。", "撳舖頭、名牌或者下面路線圖嘅站就會行過去。"],
-    hans: coarse() ? ["拖动街景四处看。", "按住 ▲ 前进，◀ ▶ 转身。", "点名牌或下方路线图的站点就会走过去。"] : ["W A S D 或方向键走路，按住 Shift 走快些。", "拖动鼠标四处看，滚动滚轮慢慢走。", "点店铺、名牌或下方路线图的站点就会走过去。"],
-  }[lang];
+  const setHelp = useApp((s) => s.setHelp);
   return (
     <div className="welcome">
       <div className="hero-title">
@@ -30,10 +22,10 @@ function Welcome() {
       </div>
       <h1>{t("hero.h")}</h1>
       <p className="lede">{t("hero.p")}</p>
-      <ul className="how">{how.map((h) => <li key={h}>{h}</li>)}</ul>
       <div className="cta">
         <button className="btn red" onClick={() => go("hk")}>{lang === "en" ? "Start walking" : lang === "hant" ? "開始行" : "开始走"}</button>
         <button className="btn" onClick={() => go("pass")}>{t("hero.c2")}</button>
+        <button className="btn ghost" onClick={() => setHelp(true)}>{lang === "en" ? "How to get around" : lang === "hant" ? "點樣行" : "怎样走"}</button>
       </div>
       <Steps />
     </div>

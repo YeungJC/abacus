@@ -77,61 +77,65 @@ export function shade(hex: string, amt: number) {
 }
 
 /**
- * Upper-floor facade of a shophouse: plaster, floor lines, shuttered or lit windows.
- * Returns colour and emissive (lit windows only) textures.
+ * Paint the upper-floor facade of a shophouse (plaster, floor lines, shuttered or lit
+ * windows) into a colour canvas and an emissive canvas (lit windows only), at (ox, oy).
+ * Size: 256 × 128 per floor.
  */
-export function facadeTex(seed: number, wall: string, floors: number) {
+export function paintFacade(seed: number, wall: string, floors: number, c: CanvasRenderingContext2D, e: CanvasRenderingContext2D, ox = 0, oy = 0) {
   const r = rng(seed);
   const W = 256, H = 128 * floors;
-  const lit: [number, number, number, number, string][] = [];
-  const map = canvasTex(W, H, (c) => {
-    c.fillStyle = wall; c.fillRect(0, 0, W, H);
-    // weathering
-    for (let i = 0; i < 260; i++) {
-      c.fillStyle = `rgba(0,0,0,${r() * 0.06})`;
-      c.fillRect(r() * W, r() * H, 2 + r() * 30, 2 + r() * 40);
-    }
-    const cols = r() > 0.5 ? 3 : 2;
-    for (let f = 0; f < floors; f++) {
-      const y0 = f * 128;
-      // floor band
-      c.fillStyle = "rgba(0,0,0,.35)"; c.fillRect(0, y0 + 122, W, 6);
-      for (let k = 0; k < cols; k++) {
-        const ww = cols === 3 ? 52 : 70, gap = (W - cols * ww) / (cols + 1);
-        const x = gap + k * (ww + gap), y = y0 + 26, hh = 74;
-        const on = r() > 0.4;
-        c.fillStyle = "#0c0606"; c.fillRect(x - 4, y - 4, ww + 8, hh + 8);
-        if (on) {
-          const col = r() > 0.3 ? "#ffb35c" : "#ffd9a0";
-          c.fillStyle = col; c.fillRect(x, y, ww, hh);
-          lit.push([x, y, ww, hh, col]);
-          // lattice
-          c.strokeStyle = "rgba(60,20,10,.85)"; c.lineWidth = 3;
-          for (let i = 1; i < 3; i++) { c.beginPath(); c.moveTo(x + (ww * i) / 3, y); c.lineTo(x + (ww * i) / 3, y + hh); c.stroke(); }
-          for (let i = 1; i < 4; i++) { c.beginPath(); c.moveTo(x, y + (hh * i) / 4); c.lineTo(x + ww, y + (hh * i) / 4); c.stroke(); }
-        } else {
-          // closed shutters
-          c.fillStyle = r() > 0.5 ? "#3d5a4c" : "#5a2a22"; c.fillRect(x, y, ww, hh);
-          c.fillStyle = "rgba(0,0,0,.3)";
-          for (let yy = y + 4; yy < y + hh; yy += 7) c.fillRect(x, yy, ww, 2);
-          c.fillRect(x + ww / 2 - 1, y, 2, hh);
-        }
-        // sill
-        c.fillStyle = "rgba(255,255,255,.08)"; c.fillRect(x - 6, y + hh + 4, ww + 12, 4);
+  c.save(); c.translate(ox, oy);
+  c.beginPath(); c.rect(0, 0, W, H); c.clip();
+  e.save(); e.translate(ox, oy);
+  e.fillStyle = "#000"; e.fillRect(0, 0, W, H);
+  c.fillStyle = wall; c.fillRect(0, 0, W, H);
+  // weathering
+  for (let i = 0; i < 260; i++) {
+    c.fillStyle = `rgba(0,0,0,${r() * 0.06})`;
+    c.fillRect(r() * W, r() * H, 2 + r() * 30, 2 + r() * 40);
+  }
+  const lattice = (g: CanvasRenderingContext2D, x: number, y: number, ww: number, hh: number) => {
+    for (let i = 1; i < 3; i++) { g.beginPath(); g.moveTo(x + (ww * i) / 3, y); g.lineTo(x + (ww * i) / 3, y + hh); g.stroke(); }
+    for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(x, y + (hh * i) / 4); g.lineTo(x + ww, y + (hh * i) / 4); g.stroke(); }
+  };
+  const cols = r() > 0.5 ? 3 : 2;
+  for (let f = 0; f < floors; f++) {
+    const y0 = f * 128;
+    c.fillStyle = "rgba(0,0,0,.35)"; c.fillRect(0, y0 + 122, W, 6);
+    for (let k = 0; k < cols; k++) {
+      const ww = cols === 3 ? 52 : 70, gap = (W - cols * ww) / (cols + 1);
+      const x = gap + k * (ww + gap), y = y0 + 26, hh = 74;
+      const on = r() > 0.4;
+      c.fillStyle = "#0c0606"; c.fillRect(x - 4, y - 4, ww + 8, hh + 8);
+      if (on) {
+        const col = r() > 0.3 ? "#ffb35c" : "#ffd9a0";
+        c.fillStyle = col; c.fillRect(x, y, ww, hh);
+        c.strokeStyle = "rgba(60,20,10,.85)"; c.lineWidth = 3; lattice(c, x, y, ww, hh);
+        e.fillStyle = col; e.fillRect(x, y, ww, hh);
+        e.strokeStyle = "#000"; e.lineWidth = 3; lattice(e, x, y, ww, hh);
+        // a curtain half drawn
+        if (r() > 0.6) { c.fillStyle = "rgba(120,30,20,.55)"; c.fillRect(x, y, ww * 0.4, hh); e.fillStyle = "rgba(0,0,0,.6)"; e.fillRect(x, y, ww * 0.4, hh); }
+      } else {
+        c.fillStyle = r() > 0.5 ? "#3d5a4c" : "#5a2a22"; c.fillRect(x, y, ww, hh);
+        c.fillStyle = "rgba(0,0,0,.3)";
+        for (let yy = y + 4; yy < y + hh; yy += 7) c.fillRect(x, yy, ww, 2);
+        c.fillRect(x + ww / 2 - 1, y, 2, hh);
       }
-      // a hanging air-con unit or a pot plant now and then
-      if (r() > 0.6) { c.fillStyle = "#9a9590"; c.fillRect(W * r() * 0.7, y0 + 100, 34, 18); }
+      c.fillStyle = "rgba(255,255,255,.08)"; c.fillRect(x - 6, y + hh + 4, ww + 12, 4);
     }
-  });
-  const emissive = canvasTex(W, H, (c) => {
-    c.fillStyle = "#000"; c.fillRect(0, 0, W, H);
-    for (const [x, y, ww, hh, col] of lit) {
-      c.fillStyle = col; c.fillRect(x, y, ww, hh);
-      c.strokeStyle = "#000"; c.lineWidth = 3;
-      for (let i = 1; i < 3; i++) { c.beginPath(); c.moveTo(x + (ww * i) / 3, y); c.lineTo(x + (ww * i) / 3, y + hh); c.stroke(); }
-      for (let i = 1; i < 4; i++) { c.beginPath(); c.moveTo(x, y + (hh * i) / 4); c.lineTo(x + ww, y + (hh * i) / 4); c.stroke(); }
-    }
-  });
+  }
+  c.restore(); e.restore();
+}
+
+/** A shophouse facade as its own pair of textures. */
+export function facadeTex(seed: number, wall: string, floors: number) {
+  const W = 256, H = 128 * floors;
+  const cm = document.createElement("canvas"), ce = document.createElement("canvas");
+  cm.width = ce.width = W; cm.height = ce.height = H;
+  paintFacade(seed, wall, floors, cm.getContext("2d")!, ce.getContext("2d")!);
+  const map = new THREE.CanvasTexture(cm), emissive = new THREE.CanvasTexture(ce);
+  map.colorSpace = emissive.colorSpace = THREE.SRGBColorSpace;
+  map.anisotropy = emissive.anisotropy = 8;
   return { map, emissive };
 }
 
@@ -194,5 +198,79 @@ export function neonTex(text: string, col: string) {
     const step = (h - 40) / chars.length;
     c.font = `700 ${Math.min(96, step * 0.82)}px ${BRUSH}`;
     chars.forEach((ch, i) => c.fillText(ch, w / 2, 20 + step * (i + 0.5)));
+  });
+}
+
+/** Soft radial glow, for light scattering in wet air around lanterns and sparks. */
+let halo: THREE.CanvasTexture | null = null;
+export function haloTex() {
+  halo ??= canvasTex(128, 128, (c, w) => {
+    const g = c.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+    g.addColorStop(0, "rgba(255,255,255,1)");
+    g.addColorStop(0.18, "rgba(255,255,255,.55)");
+    g.addColorStop(0.45, "rgba(255,255,255,.14)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    c.fillStyle = g; c.fillRect(0, 0, w, w);
+  });
+  return halo;
+}
+
+/**
+ * Roughness for the street: dark = smooth standing water, light = rough stone.
+ * Puddles gather in the middle of the lane and along the kerbs.
+ */
+export function puddleTex() {
+  const r = rng(21);
+  const t = canvasTex(512, 1024, (c, w, h) => {
+    c.fillStyle = "#d8d8d8"; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 70; i++) {
+      const x = r() < 0.35 ? (r() < 0.5 ? 30 + r() * 60 : w - 30 - r() * 60) : 100 + r() * (w - 200);
+      const y = r() * h, rx = 20 + r() * 90, ry = 30 + r() * 160;
+      const g = c.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
+      g.addColorStop(0, "rgba(10,10,10,.95)"); g.addColorStop(0.6, "rgba(40,40,40,.6)"); g.addColorStop(1, "rgba(216,216,216,0)");
+      c.save(); c.translate(x, y); c.scale(rx / Math.max(rx, ry), ry / Math.max(rx, ry)); c.translate(-x, -y);
+      c.fillStyle = g; c.beginPath(); c.arc(x, y, Math.max(rx, ry), 0, Math.PI * 2); c.fill(); c.restore();
+    }
+    // stone joints hold water too
+    c.strokeStyle = "rgba(30,30,30,.5)"; c.lineWidth = 2;
+    for (let y = 0; y < h; y += 64) { c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); }
+  }, false);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  return t;
+}
+
+/** A pulled-down roller shutter, with a sticker or two. */
+export function shutterTex(seed: number) {
+  const r = rng(seed);
+  return canvasTex(256, 256, (c, w, h) => {
+    const base = 120 + Math.floor(r() * 40);
+    c.fillStyle = `rgb(${base},${base + 2},${base + 6})`; c.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y += 8) {
+      c.fillStyle = "rgba(0,0,0,.28)"; c.fillRect(0, y, w, 2);
+      c.fillStyle = "rgba(255,255,255,.08)"; c.fillRect(0, y + 2, w, 1);
+    }
+    c.fillStyle = "rgba(60,30,10,.25)";
+    for (let i = 0; i < 6; i++) c.fillRect(r() * w, r() * h, 4 + r() * 20, 30 + r() * 80);
+    if (r() > 0.4) {
+      c.fillStyle = "#c4291e"; c.fillRect(w * 0.6, h * 0.3, 60, 80);
+      c.fillStyle = "#f6e7c4"; c.font = `700 40px ${BRUSH}`; c.textAlign = "center"; c.fillText("吉", w * 0.6 + 30, h * 0.3 + 54);
+    }
+  });
+}
+
+/** Washing on a bamboo pole. */
+export function clothTex(seed: number) {
+  const r = rng(seed);
+  const cols = ["#e8e2d4", "#4a6fa5", "#c84a3a", "#2e2e34", "#e0b84a", "#8fb0a0", "#d68aa0"];
+  return canvasTex(256, 64, (c, w, h) => {
+    c.clearRect(0, 0, w, h);
+    let x = 4;
+    while (x < w - 20) {
+      const cw = 18 + r() * 34, ch = 26 + r() * 34;
+      c.fillStyle = cols[Math.floor(r() * cols.length)];
+      c.fillRect(x, 0, cw, ch);
+      c.fillStyle = "rgba(0,0,0,.18)"; c.fillRect(x, ch - 4, cw, 4);
+      x += cw + 3 + r() * 8;
+    }
   });
 }

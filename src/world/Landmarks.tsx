@@ -1,4 +1,4 @@
-import { useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useThree, type ThreeEvent } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import * as THREE from "three";
 import { EVENTS, EXITS, GALA_AT, SOCS, socById, type Lang } from "../data";
@@ -12,11 +12,12 @@ import { BRUSH, canvasTex, fitText, SERIF, shade, signTex } from "./textures";
 /** Clicking anything inside walks you to that place. A drag to look around doesn't count. */
 export function Place({ id, children }: { id: StopId; children: ReactNode }) {
   const go = useApp((s) => s.go);
+  const gl = useThree((s) => s.gl);
   return (
     <group
       onClick={(e: ThreeEvent<MouseEvent>) => { if (e.delta > 6) return; e.stopPropagation(); go(id); }}
-      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
-      onPointerOut={() => { document.body.style.cursor = ""; }}
+      onPointerOver={(e) => { e.stopPropagation(); gl.domElement.style.cursor = "pointer"; }}
+      onPointerOut={() => { gl.domElement.style.cursor = "grab"; }}
     >
       {children}
     </group>
@@ -263,7 +264,6 @@ export function NoticeBoard({ lang }: { lang: Lang }) {
         <mesh position={[0.35, 0.75 + bh, 0]} rotation={[0, 0, -0.35]} material={tileMat}>
           <boxGeometry args={[0.9, 0.08, bw + 0.4]} />
         </mesh>
-        <pointLight position={[1.2, 0.6 + bh, 0]} color="#ffcf8a" intensity={6} distance={5} />
       </Shophouse>
     </Place>
   );
@@ -373,7 +373,6 @@ export function StationExit({ lang }: { lang: Lang }) {
         {/* lit totem listing the exits */}
         <mesh position={[0.6, 1.3, -stop.w / 2 + 0.6]}><boxGeometry args={[0.3, 2.6, 0.62]} /><meshStandardMaterial color="#151515" /></mesh>
         <Board tex={list} w={0.56} h={0.98} position={[0.76, 1.6, -stop.w / 2 + 0.6]} glow={0.9} />
-        <pointLight position={[1.4, 2.4, 0]} color="#ffe28a" intensity={6} distance={5} />
       </Shophouse>
     </Place>
   );

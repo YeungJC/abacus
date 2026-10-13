@@ -42,7 +42,7 @@ export const T: Record<string, [string, string, string]> = {
   "foot": ["A student-run concept mockup, October 2026. Not an official university site.", "學生自發概念稿，2026年10月。非大學官方網站。", "学生自发概念稿，2026年10月。非大学官方网站。"],
   "hero.hint": ["Move your pointer to look down the street. Tap a lantern to visit its society.", "移動滑鼠望落條街。撳燈籠去睇學會。", "移动鼠标望向街道。点灯笼查看学会。"],
   "cal.shared": ["Shared: everyone with this link sees the same almanac, live.", "共用：所有開呢條連結嘅人即時睇到同一本通勝。", "共享：所有打开此链接的人实时看到同一本通胜。"],
-  "cal.local": ["Saved in this browser only. Open the published page to share drafts.", "只存喺呢個瀏覽器。開發佈版先可以共用草稿。", "仅保存在本浏览器。打开发布版才能共享草稿。"],
+  "cal.local": ["Drafts are saved in this browser only.", "草稿只存喺呢個瀏覽器。", "草稿仅保存在本浏览器。"],
   "cal.readonly": ["You can view the almanac. Ask the owner for Contributor access to add drafts.", "你可以睇通勝。向擁有人申請參與者權限先可以加草稿。", "你可以查看通胜。向所有者申请参与者权限才能添加草稿。"],
   "cal.connecting": ["Connecting to the shared almanac…", "連接共用通勝中…", "正在连接共享通胜…"],
   "cal.remove": ["Remove", "刪除", "删除"],

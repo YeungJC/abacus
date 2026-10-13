@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { lanternTex } from "./textures";
+import { haloTex, lanternTex } from "./textures";
 
 /** A Chinese paper lantern's silhouette, spun around its axis. */
 export const lanternGeo = (() => {
@@ -62,6 +62,12 @@ export default function Lantern({ char, paper, position, size = 1, drop = 0.4, g
           <mesh geometry={capGeo} material={gold} position={[0, 0.58, 0]} />
           <mesh geometry={capGeo} material={gold} position={[0, -0.58, 0]} />
           <mesh geometry={tasselGeo} material={tassel} position={[0, -0.9, 0]} />
+          {!ghost && (
+            // light scattering in the rainy air around the paper
+            <sprite scale={[2.6, 2.6, 1]}>
+              <spriteMaterial map={haloTex()} color={paper} transparent opacity={0.42} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+            </sprite>
+          )}
         </group>
       </group>
     </group>
