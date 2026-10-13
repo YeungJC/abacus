@@ -1,39 +1,51 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import Committees from "./components/Committees";
 import Guide from "./components/Guide";
-import Header from "./components/Header";
+import Header, { canWalk } from "./components/Header";
 import Hero from "./components/Hero";
 import Pass from "./components/Pass";
 import Societies from "./components/Societies";
 import Steps from "./components/Steps";
 import WhatsOn from "./components/WhatsOn";
-import { useT } from "./store";
+import { useApp, useT } from "./store";
+import MapStrip from "./ui/MapStrip";
+import Pad from "./ui/Pad";
+import Prompt from "./ui/Prompt";
+import Sheet from "./ui/Sheet";
 
-export default function App() {
+const World = lazy(() => import("./world/World"));
+
+/** The whole site as a street you walk down. */
+function Street() {
+  const [coarse] = useState(() => matchMedia("(pointer: coarse)").matches);
+  return (
+    <div className="world">
+      <div className="world-canvas">
+        <Suspense fallback={<div className="world-loading">同</div>}>
+          <World />
+        </Suspense>
+      </div>
+      <Header />
+      <Prompt />
+      <Sheet />
+      {coarse && <Pad />}
+      <MapStrip />
+    </div>
+  );
+}
+
+/** The same content as a plain scrolling page. */
+function Page() {
   const { t } = useT();
   const [open, setOpen] = useState<Set<string>>(new Set());
-  const [flash, setFlash] = useState<string | null>(null);
-
   const toggle = (id: string) => setOpen((o) => { const n = new Set(o); n.has(id) ? n.delete(id) : n.add(id); return n; });
-
-  /** A lantern was picked in the street: unroll that society's scroll and bring it into view. */
-  const pick = (id: string) => {
-    setOpen((o) => new Set(o).add(id));
-    setFlash(id);
-    requestAnimationFrame(() => {
-      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-      document.getElementById("scroll-" + id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
-    });
-    setTimeout(() => setFlash(null), 1300);
-  };
-
   return (
     <>
       <Header />
       <main id="top">
-        <Hero onPick={pick} />
+        <Hero />
         <Steps />
-        <Societies open={open} toggle={toggle} flash={flash} />
+        <Societies open={open} toggle={toggle} flash={null} />
         <WhatsOn />
         <Pass />
         <Guide />
@@ -47,4 +59,9 @@ export default function App() {
       </footer>
     </>
   );
+}
+
+export default function App() {
+  const mode = useApp((s) => s.mode);
+  return mode === "world" && canWalk ? <Street /> : <Page />;
 }

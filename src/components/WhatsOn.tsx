@@ -55,10 +55,9 @@ function useFirecrackers() {
   return { cv, burst };
 }
 
-export default function WhatsOn() {
+export default function WhatsOn({ gala = true }: { gala?: boolean }) {
   const { t, lang } = useT();
   const [filter, setFilter] = useState(() => local.get("filter", "all"));
-  const cd = useCountdown(GALA_AT);
   const { cv, burst } = useFirecrackers();
 
   const pick = (id: string) => { setFilter(id); local.set("filter", id); };
@@ -69,7 +68,6 @@ export default function WhatsOn() {
       setTimeout(() => { burst(r.left + r.width / 2 + (Math.random() - 0.5) * 260, r.top - 40 - Math.random() * 160); pluck(6 - i, 0.12); }, ms),
     );
   };
-  const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
     <section className="panel" id="whatson">
@@ -103,22 +101,32 @@ export default function WhatsOn() {
         </div>
         <p className="note">{t("ev.note")}</p>
 
-        <div className="gala" style={{ marginTop: 40 }}>
-          <div>
-            <span className="eyebrow" style={{ color: "inherit", opacity: 0.8 }}>丁未 · Year of the Goat</span>
-            <h3>{t("gala.h")}</h3>
-            <p>{t("gala.p")}</p>
-            <button className="btn" onClick={light}>{t("gala.btn")}</button>
-          </div>
-          <div className="clock">
-            <div><b>{cd.d}</b><span>{t("t.d")}</span></div>
-            <div><b>{pad(cd.h)}</b><span>{t("t.h")}</span></div>
-            <div><b>{pad(cd.m)}</b><span>{t("t.m")}</span></div>
-            <div><b>{pad(cd.s)}</b><span>{t("t.s")}</span></div>
-          </div>
-        </div>
+        {gala && <Gala onLight={light} />}
       </div>
       <canvas id="fx" ref={cv} aria-hidden="true" />
     </section>
+  );
+}
+
+/** The gala banner: countdown to the Lunar New Year Gala and a button to set off firecrackers. */
+export function Gala({ onLight }: { onLight: (e: React.MouseEvent<HTMLButtonElement>) => void }) {
+  const { t } = useT();
+  const cd = useCountdown(GALA_AT);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return (
+    <div className="gala">
+      <div>
+        <span className="eyebrow" style={{ color: "inherit", opacity: 0.8 }}>丁未 · Year of the Goat</span>
+        <h3>{t("gala.h")}</h3>
+        <p>{t("gala.p")}</p>
+        <button className="btn" onClick={onLight}>{t("gala.btn")}</button>
+      </div>
+      <div className="clock">
+        <div><b>{cd.d}</b><span>{t("t.d")}</span></div>
+        <div><b>{pad(cd.h)}</b><span>{t("t.h")}</span></div>
+        <div><b>{pad(cd.m)}</b><span>{t("t.m")}</span></div>
+        <div><b>{pad(cd.s)}</b><span>{t("t.s")}</span></div>
+      </div>
+    </div>
   );
 }

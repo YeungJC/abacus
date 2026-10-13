@@ -16,10 +16,18 @@ export function LangSwitch({ labels }: { labels?: Record<Lang, string> }) {
   );
 }
 
+/** Can this browser draw the 3D street? */
+export const canWalk = (() => {
+  try { return !!document.createElement("canvas").getContext("webgl2"); } catch { return false; }
+})();
+
 const systemDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
 
 export default function Header() {
-  const { t } = useT();
+  const { t, lang } = useT();
+  const mode = useApp((s) => s.mode);
+  const narrow = typeof window !== "undefined" && window.innerWidth < 560;
+  const setMode = useApp((s) => s.setMode);
   const sound = useApp((s) => s.sound);
   const setSound = useApp((s) => s.setSound);
   const [dark, setDark] = useState(() => {
@@ -41,17 +49,22 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bar">
+    <header className={"bar" + (mode === "world" ? " bar-world" : "")}>
       <div className="wrap">
         <a className="logo" href="#top"><span className="seal">同</span><b>TONG Manchester</b></a>
-        <nav className="nav" aria-label="Sections">
+        {mode === "page" && <nav className="nav" aria-label="Sections">
           <a href="#societies">{t("nav.soc")}</a>
           <a href="#whatson">{t("nav.ev")}</a>
           <a href="#pass">{t("nav.pass")}</a>
           <a href="#guide">{t("nav.guide")}</a>
           <a href="#committees">{t("nav.com")}</a>
-        </nav>
+        </nav>}
         <div className="tools">
+          {canWalk && (
+            <button className="icon-btn mode-btn" onClick={() => { setMode(mode === "world" ? "page" : "world"); window.scrollTo(0, 0); }}>
+              {mode === "world" ? (lang === "en" ? (narrow ? "Page" : "Read as a page") : "頁面版") : lang === "en" ? (narrow ? "3D" : "Walk the street") : "行條街"}
+            </button>
+          )}
           <LangSwitch />
           <button
             className="icon-btn"
