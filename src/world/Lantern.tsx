@@ -64,7 +64,7 @@ export default function Lantern({ char, paper, position, size = 1, drop = 0.4, g
           <mesh geometry={tasselGeo} material={tassel} position={[0, -0.9, 0]} />
           {!ghost && (
             // light scattering in the rainy air around the paper
-            <sprite scale={[2.6, 2.6, 1]}>
+            <sprite scale={[2.6, 2.6, 1]} raycast={() => null}>
               <spriteMaterial map={haloTex()} color={paper} transparent opacity={0.42} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
             </sprite>
           )}

@@ -2,9 +2,9 @@ import { MeshReflectorMaterial } from "@react-three/drei";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { useApp } from "../store";
 import { lanternGeo } from "./Lantern";
+import People from "./People";
 import { walkToPoint } from "./Player";
 import { buildRow, type Spec } from "./Shophouse";
 import { HALF, STOPS } from "./stops";
@@ -439,73 +439,6 @@ function Fireworks() {
   );
 }
 
-/* ── people out in the rain ──────────────────────── */
-
-const COATS = ["#1e2430", "#3a2a24", "#2a3a34", "#4a2a2a", "#2a2a2e", "#5a4a3a"];
-const BROLLIES = ["#c4291e", "#1f3d6b", "#e0b84a", "#2f6e63", "#2a2a2e", "#d6688a", "#f2efe6"];
-
-function Pedestrians() {
-  const N = 12;
-  const people = useMemo(() => {
-    const r = rng(33);
-    return Array.from({ length: N }, (_, i) => ({
-      x: (r() < 0.5 ? -1 : 1) * (0.9 + r() * 2),
-      z: Z_FROM - 4 - r() * 62,
-      dir: r() < 0.5 ? 1 : -1,
-      speed: 0.7 + r() * 0.6,
-      ph: r() * 6,
-      coat: new THREE.Color(COATS[i % COATS.length]),
-      brolly: new THREE.Color(BROLLIES[(i * 3) % BROLLIES.length]),
-      h: 0.92 + r() * 0.16,
-    }));
-  }, []);
-  // one instanced mesh per body part, so twelve people cost five draw calls
-  const kit = useMemo(() => ({
-    body: [new THREE.CapsuleGeometry(0.2, 0.75, 4, 10).translate(0, 0.82, 0), new THREE.MeshStandardMaterial({ roughness: 0.8 })] as const,
-    head: [new THREE.SphereGeometry(0.13, 12, 10).translate(0, 1.5, 0), new THREE.MeshStandardMaterial({ color: "#2a1e18", roughness: 0.6 })] as const,
-    legs: [mergeLegs(), new THREE.MeshStandardMaterial({ color: "#141418" })] as const,
-    stick: [new THREE.CylinderGeometry(0.012, 0.012, 0.75).translate(0.1, 1.55, -0.05), new THREE.MeshStandardMaterial({ color: "#222" })] as const,
-    brolly: [new THREE.ConeGeometry(0.62, 0.26, 10, 1, true).translate(0.1, 1.95, -0.05), new THREE.MeshStandardMaterial({ roughness: 0.35, side: THREE.DoubleSide })] as const,
-  }), []);
-  const refs = useRef<Record<string, THREE.InstancedMesh>>({});
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  useEffect(() => {
-    people.forEach((p, i) => {
-      refs.current.body?.setColorAt(i, p.coat);
-      refs.current.brolly?.setColorAt(i, p.brolly);
-    });
-    for (const k of ["body", "brolly"]) if (refs.current[k]?.instanceColor) refs.current[k].instanceColor!.needsUpdate = true;
-  }, [people]);
-  useFrame(({ clock }, dt) => {
-    const t = clock.elapsedTime;
-    people.forEach((p, i) => {
-      // dir 1 walks down the street (-z), -1 walks back up; turn round before the stage and the end
-      p.z -= p.dir * p.speed * Math.min(dt, 0.05);
-      if (p.z < -41) p.dir = -1;
-      if (p.z > Z_FROM - 2) p.dir = 1;
-      dummy.position.set(p.x, Math.abs(Math.sin(t * 5 * p.speed + p.ph)) * 0.03, p.z);
-      dummy.rotation.set(0, p.dir === 1 ? 0 : Math.PI, Math.sin(t * 5 * p.speed + p.ph) * 0.03);
-      dummy.scale.setScalar(p.h);
-      dummy.updateMatrix();
-      for (const k of Object.keys(kit)) refs.current[k]?.setMatrixAt(i, dummy.matrix);
-    });
-    for (const k of Object.keys(kit)) if (refs.current[k]) refs.current[k].instanceMatrix.needsUpdate = true;
-  });
-  return (
-    <>
-      {Object.entries(kit).map(([k, [geo, material]]) => (
-        <instancedMesh key={k} ref={(m) => { if (m) refs.current[k] = m; }} args={[geo, material, N]} raycast={() => null} frustumCulled={false} />
-      ))}
-    </>
-  );
-}
-
-function mergeLegs() {
-  const a = new THREE.CapsuleGeometry(0.065, 0.3, 3, 6).translate(-0.09, 0.22, 0);
-  const b = new THREE.CapsuleGeometry(0.065, 0.3, 3, 6).translate(0.09, 0.22, 0);
-  return mergeGeometries([a, b])!;
-}
-
 export default function Street({ quality }: { quality: "high" | "low" }) {
   return (
     <>
@@ -518,7 +451,7 @@ export default function Street({ quality }: { quality: "high" | "low" }) {
       <Rain />
       <SkyLanterns />
       <Fireworks />
-      <Pedestrians />
+      <People />
       {/* lantern light pooling on the street, every ten metres */}
       {[12, -2, -16, -30].map((z, i) => (
         <pointLight key={z} position={[i % 2 ? 1.2 : -1.2, 5, z]} color="#ff8a50" intensity={80} distance={19} decay={2} />
