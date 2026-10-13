@@ -1,0 +1,1151 @@
+<title>同 TONG Manchester</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@400;600;900&display=swap">
+<style>
+/* Layout: a hand-scroll (手卷) read top to bottom. Ink-wash hero with societies hung as lanterns,
+   then mounted panels (表具) for each section, cinnabar seals marking anything you can press. */
+:root {
+  --paper: #ebe0c8;        /* aged xuan paper */
+  --paper-2: #e0d2b4;      /* mounting silk */
+  --paper-3: #d4c39f;
+  --ink: #1e1a16;
+  --ink-soft: #5b5045;
+  --cinnabar: #ae2a1f;     /* seal paste 印泥 */
+  --cinnabar-ink: #fbefe0;
+  --gold: #9a7424;
+  --jade: #3b6a58;
+  --indigo: #36507c;
+  --rule: rgba(30, 26, 22, .22);
+  --shadow: rgba(60, 40, 20, .18);
+  --f-brush: "LXGW WenKai TC", "Kaiti TC", "STKaiti", "KaiTi", "Noto Serif TC", serif;
+  --f-body: "Noto Serif TC", "Songti TC", "SimSun", Georgia, serif;
+  --f-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.6rem;
+  --step-3: 2.2rem;
+  --step-4: clamp(2.6rem, 6vw, 4.4rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15110e; --paper-2: #1f1813; --paper-3: #2c2219;
+    --ink: #eee2c8; --ink-soft: #b3a68c;
+    --cinnabar: #d4473a; --cinnabar-ink: #1a0f0b;
+    --gold: #d8ad4e; --jade: #74aa92; --indigo: #8299cc;
+    --rule: rgba(238, 226, 200, .2); --shadow: rgba(0, 0, 0, .5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15110e; --paper-2: #1f1813; --paper-3: #2c2219;
+  --ink: #eee2c8; --ink-soft: #b3a68c;
+  --cinnabar: #d4473a; --cinnabar-ink: #1a0f0b;
+  --gold: #d8ad4e; --jade: #74aa92; --indigo: #8299cc;
+  --rule: rgba(238, 226, 200, .2); --shadow: rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+/* paper fibre */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+  background-image:
+    radial-gradient(circle at 20% 30%, var(--paper-2) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 70% 80%, var(--paper-3) 0 .8px, transparent 1.2px);
+  background-size: 7px 9px, 13px 11px;
+}
+main, header, footer { position: relative; z-index: 1; }
+h1, h2, h3 { font-family: var(--f-brush); font-weight: 700; text-wrap: balance; line-height: 1.15; margin: 0; }
+p { margin: 0; }
+a { color: inherit; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--cinnabar); outline-offset: 3px; }
+.wrap { max-width: 1120px; margin-inline: auto; padding-inline: 16px; }
+@media (min-width: 720px) { .wrap { padding-inline: 32px; } }
+
+/* ── top bar ───────────────────────────────── */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+}
+.bar .wrap { display: flex; align-items: center; gap: 16px; min-height: 58px; flex-wrap: wrap; padding-block: 6px; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo .seal { width: 34px; height: 34px; font-size: 22px; }
+.logo b { font-family: var(--f-brush); font-size: 1.15rem; letter-spacing: .04em; }
+.nav { display: flex; gap: 18px; margin-inline-start: auto; flex-wrap: wrap; }
+.nav a { text-decoration: none; font-size: .92rem; color: var(--ink-soft); }
+.nav a:hover { color: var(--cinnabar); }
+.tools { display: flex; gap: 6px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+.seg button { border: 0; background: none; padding: 4px 10px; font-size: .85rem; font-family: var(--f-brush); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.icon-btn { border: 1px solid var(--rule); background: none; border-radius: 3px; padding: 4px 9px; font-family: var(--f-brush); font-size: .9rem; }
+.icon-btn[aria-pressed="true"] { background: var(--cinnabar); color: var(--cinnabar-ink); border-color: var(--cinnabar); }
+@media (max-width: 860px) { .nav { display: none; } .tools { margin-inline-start: auto; } }
+
+/* ── seal (印) ───────────────────────────── */
+.seal {
+  display: inline-grid; place-items: center; flex: none;
+  background: var(--cinnabar); color: var(--cinnabar-ink);
+  font-family: var(--f-brush); font-weight: 700; line-height: 1;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 2px var(--cinnabar), inset 0 0 0 3.5px var(--cinnabar-ink);
+}
+
+/* ── hero ─────────────────────────────────── */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--rule); }
+#inkCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
+.hero-inner { position: relative; display: grid; gap: 28px; padding-block: 40px 28px; pointer-events: none; }
+.hero-inner > * { pointer-events: auto; }
+.hero-title { display: flex; gap: 22px; align-items: flex-start; }
+.big-tong {
+  font-family: var(--f-brush); font-size: clamp(4.5rem, 12vw, 8rem); line-height: .9; font-weight: 700;
+  color: var(--ink);
+}
+.big-tong span { display: inline-block; animation: brush 1.4s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes brush { from { clip-path: inset(0 100% 0 0); filter: blur(4px); } to { clip-path: inset(0 0 0 0); filter: blur(0); } }
+.vertical {
+  writing-mode: vertical-rl; font-family: var(--f-brush); font-size: 1.05rem; letter-spacing: .3em;
+  color: var(--ink-soft); padding-top: 6px;
+}
+.hero-title .seal { width: 46px; height: 46px; font-size: 15px; writing-mode: vertical-rl; letter-spacing: .05em; margin-top: 8px; }
+.hero h1 { font-size: clamp(2rem, 4.2vw, 3.3rem); max-width: 24ch; }
+.hero .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 52ch; }
+.cta { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  border: 1.5px solid var(--ink); padding: 10px 18px; border-radius: 2px; background: none;
+  font-family: var(--f-brush); font-size: 1.05rem;
+  transition: transform .15s, background .15s, color .15s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn.red { background: var(--cinnabar); border-color: var(--cinnabar); color: var(--cinnabar-ink); }
+.hint { font-size: .8rem; color: var(--ink-soft); font-family: var(--f-mono); letter-spacing: .04em; }
+
+/* lantern string */
+.lantern-row { position: relative; height: 230px; margin-top: 4px; }
+.lantern-row svg.rope { position: absolute; inset: 0 0 auto 0; width: 100%; height: 120px; overflow: visible; }
+.lantern-row svg.rope path { stroke: var(--ink); stroke-width: 1.4; fill: none; }
+.lantern {
+  position: absolute; transform: translateX(-50%); transform-origin: 50% 0;
+  display: grid; justify-items: center; background: none; border: 0; padding: 0;
+  animation: sway 4s ease-in-out infinite;
+}
+.lantern .cord { width: 1.4px; height: 18px; background: var(--ink); }
+.lantern .body {
+  --c: var(--cinnabar);
+  width: 58px; height: 70px; border-radius: 46% 46% 42% 42% / 50% 50% 46% 46%;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 9px, rgba(0,0,0,.14) 9px 10px),
+    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 70%, #fff3c4) 0%, var(--c) 62%);
+  display: grid; place-items: center; position: relative;
+  color: #fff6df; font-family: var(--f-brush); font-size: 1.6rem; font-weight: 700;
+  box-shadow: 0 6px 14px var(--shadow);
+  transition: box-shadow .3s, filter .3s;
+}
+.lantern .body::before, .lantern .body::after {
+  content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+  width: 30px; height: 7px; background: var(--gold); border-radius: 2px;
+}
+.lantern .body::before { top: -4px; }
+.lantern .body::after { bottom: -4px; }
+.lantern .tassel { width: 3px; height: 26px; background: linear-gradient(var(--gold), var(--cinnabar)); border-radius: 0 0 2px 2px; }
+.lantern .lbl { margin-top: 6px; font-size: .78rem; max-width: 92px; text-align: center; line-height: 1.25; color: var(--ink); }
+.lantern.ghost .body { --c: transparent; background: none; border: 1.5px dashed var(--ink-soft); color: var(--ink-soft); box-shadow: none; }
+.lantern.ghost .body::before, .lantern.ghost .body::after { background: var(--ink-soft); }
+.lantern:hover .body, .lantern.lit .body { box-shadow: 0 0 34px 8px color-mix(in srgb, var(--c) 55%, #ffd77a); filter: brightness(1.12); }
+.lantern:hover { animation-duration: 1.1s; }
+@keyframes sway { 0%,100% { rotate: -3deg; } 50% { rotate: 3deg; } }
+@media (max-width: 560px) {
+  .lantern .body { width: 44px; height: 54px; font-size: 1.2rem; }
+  .lantern .lbl { font-size: .68rem; max-width: 66px; }
+}
+
+/* ── sections ─────────────────────────────── */
+section.panel { padding-block: 64px; border-bottom: 1px solid var(--rule); }
+.sec-head { display: flex; gap: 18px; align-items: flex-start; margin-bottom: 30px; }
+.sec-head .seal { width: 52px; height: 52px; font-size: 30px; }
+.sec-head h2 { font-size: var(--step-3); }
+.sec-head p { color: var(--ink-soft); max-width: 60ch; margin-top: 6px; }
+.eyebrow { font-family: var(--f-mono); font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+
+/* three stops */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-block: 1px solid var(--rule); }
+.steps li { list-style: none; padding: 22px 22px 22px 0; display: grid; grid-template-columns: auto 1fr; gap: 14px; min-width: 0; }
+.steps li + li { padding-left: 22px; border-left: 1px solid var(--rule); }
+.steps .num { font-family: var(--f-brush); font-size: 2.6rem; line-height: 1; color: var(--cinnabar); }
+.steps h3 { font-size: var(--step-1); margin-bottom: 4px; }
+.steps p { color: var(--ink-soft); font-size: .95rem; }
+@media (max-width: 760px) {
+  .steps { grid-template-columns: 1fr; }
+  .steps li, .steps li + li { padding: 18px 0; border-left: 0; }
+  .steps li + li { border-top: 1px solid var(--rule); }
+}
+ol.steps { padding: 0; margin: 0; }
+
+/* societies: hanging scrolls */
+.scrolls { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px; align-items: start; }
+.scroll { --c: var(--cinnabar); position: relative; min-width: 0; }
+.scroll .rod { height: 12px; border-radius: 6px; background: linear-gradient(var(--gold), color-mix(in srgb, var(--gold) 55%, var(--ink))); position: relative; z-index: 2; }
+.scroll .rod::before, .scroll .rod::after { content: ""; position: absolute; top: -2px; width: 12px; height: 16px; border-radius: 3px; background: var(--ink); }
+.scroll .rod::before { left: -6px; } .scroll .rod::after { right: -6px; }
+.scroll button.face {
+  display: block; width: calc(100% - 20px); margin-inline: 10px; text-align: left; border: 0;
+  background: var(--paper-2); border-inline: 6px solid color-mix(in srgb, var(--c) 70%, var(--paper-2));
+  padding: 18px 18px 14px; box-shadow: 0 8px 16px -10px var(--shadow);
+}
+.scroll .zh { font-family: var(--f-brush); font-size: 1.9rem; line-height: 1.1; color: var(--c); }
+.scroll .en { font-family: var(--f-brush); font-size: 1.15rem; margin-top: 4px; }
+.scroll .inst { font-family: var(--f-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-top: 2px; }
+.scroll .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s cubic-bezier(.3,.7,.2,1); }
+.scroll .more > div { overflow: hidden; }
+.scroll.open .more { grid-template-rows: 1fr; }
+.scroll .more p { color: var(--ink-soft); font-size: .95rem; padding-top: 12px; }
+.scroll .more .tagline { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 10px; font-size: .82rem; }
+.chip { border: 1px solid var(--rule); padding: 1px 8px; border-radius: 2px; }
+.scroll .pull { font-size: .8rem; color: var(--ink-soft); margin-top: 10px; display: flex; justify-content: space-between; }
+.scroll.open .pull .arrow { rotate: 180deg; }
+.pull .arrow { display: inline-block; transition: rotate .3s; }
+.scroll.flash button.face { animation: flash 1.2s ease-out; }
+@keyframes flash { 0% { box-shadow: 0 0 0 0 var(--c); } 30% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 40%, transparent); } 100% { box-shadow: 0 8px 16px -10px var(--shadow); } }
+.scroll.yours button.face { background: none; border: 1.5px dashed var(--ink-soft); }
+.scroll.yours .zh { color: var(--ink-soft); }
+
+/* events notice board */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.filters button {
+  border: 1.5px solid var(--rule); background: none; padding: 5px 12px; border-radius: 2px;
+  font-family: var(--f-brush); font-size: .95rem;
+}
+.filters button[aria-pressed="true"] { border-color: var(--cinnabar); background: var(--cinnabar); color: var(--cinnabar-ink); }
+.board { overflow-x: auto; border: 1px solid var(--rule); background: var(--paper-2); }
+.board table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.board th { text-align: left; font-family: var(--f-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); padding: 12px 14px; border-bottom: 1.5px solid var(--ink); font-weight: 400; }
+.board td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.board tr:last-child td { border-bottom: 0; }
+.board .date { font-variant-numeric: tabular-nums; white-space: nowrap; font-family: var(--f-brush); }
+.board .date small { display: block; color: var(--ink-soft); font-family: var(--f-mono); font-size: .72rem; }
+.board .title { font-family: var(--f-brush); font-size: 1.08rem; }
+.board .flag { color: var(--cinnabar); font-size: .78rem; font-family: var(--f-mono); letter-spacing: .08em; }
+.dots { display: flex; gap: 4px; flex-wrap: wrap; }
+.dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-brush); font-size: .8rem; color: #fff6df; }
+.price { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.price s { color: var(--ink-soft); font-size: .85rem; }
+.board tr.hide { display: none; }
+.note { font-size: .82rem; color: var(--ink-soft); margin-top: 10px; }
+
+/* countdown */
+.gala {
+  display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
+  background: var(--cinnabar); color: var(--cinnabar-ink); padding: 28px; position: relative; overflow: hidden;
+}
+.gala::after {
+  content: "未"; position: absolute; right: -10px; bottom: -60px; font-family: var(--f-brush); font-size: 15rem; line-height: 1;
+  opacity: .12; pointer-events: none;
+}
+.gala h3 { font-size: var(--step-2); }
+.gala p { opacity: .85; }
+.clock { display: flex; gap: 14px; font-variant-numeric: tabular-nums; position: relative; z-index: 1; }
+.clock div { text-align: center; min-width: 3.4ch; }
+.clock b { display: block; font-family: var(--f-brush); font-size: var(--step-3); line-height: 1; }
+.clock span { font-family: var(--f-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+.gala .btn { border-color: var(--cinnabar-ink); color: var(--cinnabar-ink); margin-top: 14px; position: relative; z-index: 1; }
+@media (max-width: 680px) { .gala { grid-template-columns: 1fr; } }
+#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
+
+/* pass */
+.pass-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+@media (max-width: 860px) { .pass-grid { grid-template-columns: 1fr; } }
+.envelope-stage { display: grid; justify-items: center; gap: 14px; padding-top: 150px; }
+.envelope {
+  position: relative; width: min(280px, 100%); aspect-ratio: 5 / 7; max-width: 100%;
+  perspective: 900px; border: 0; padding: 0; background: none;
+}
+.env-back, .env-front, .env-flap { position: absolute; left: 0; right: 0; }
+.env-back { inset: 0; background: var(--cinnabar); border-radius: 6px; }
+.env-front {
+  bottom: 0; height: 64%; background: color-mix(in srgb, var(--cinnabar) 88%, #000); border-radius: 0 0 6px 6px; z-index: 3;
+  display: grid; place-items: center;
+}
+.env-front .fu {
+  width: 86px; height: 86px; rotate: 45deg; background: var(--gold); display: grid; place-items: center;
+  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--gold) 60%, #000);
+}
+.env-front .fu span { rotate: -45deg; font-family: var(--f-brush); font-size: 2.8rem; color: var(--cinnabar); font-weight: 700; }
+.env-flap {
+  top: 0; height: 42%; z-index: 4; transform-origin: 50% 0; transition: transform .7s cubic-bezier(.4,.1,.2,1), z-index 0s .35s;
+  background: color-mix(in srgb, var(--cinnabar) 80%, #000);
+  clip-path: polygon(0 0, 100% 0, 100% 40%, 50% 100%, 0 40%);
+  border-radius: 6px 6px 0 0;
+}
+.envelope.open .env-flap { transform: rotateX(180deg); z-index: 1; }
+.pass-card {
+  position: absolute; left: 7%; right: 7%; top: 18%; aspect-ratio: 1.586; z-index: 2;
+  background: var(--paper); color: var(--ink); border-radius: 8px; padding: 12px 14px;
+  box-shadow: 0 10px 22px var(--shadow);
+  transition: transform .8s cubic-bezier(.3,1.3,.4,1) .35s;
+  display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto; gap: 4px 10px;
+  text-align: left; overflow: hidden;
+}
+.envelope.open .pass-card { transform: translateY(-62%); z-index: 5; }
+.pass-card .pc-title { font-family: var(--f-brush); font-size: 1.1rem; line-height: 1.1; }
+.pass-card .pc-sub { font-family: var(--f-mono); font-size: .62rem; letter-spacing: .1em; color: var(--ink-soft); }
+.pass-card .pc-name { grid-column: 1; align-self: end; font-family: var(--f-brush); font-size: 1rem; overflow-wrap: anywhere; }
+.pass-card canvas { grid-column: 2; grid-row: 1 / 3; width: 58px; height: 58px; image-rendering: pixelated; }
+.pass-card .pc-foot { grid-column: 1 / -1; display: flex; justify-content: space-between; font-size: .68rem; color: var(--ink-soft); font-family: var(--f-mono); }
+.pass-card .stamp {
+  position: absolute; right: 64px; bottom: 26px; width: 48px; height: 48px; font-size: 1.5rem;
+  opacity: 0; scale: 2.4; rotate: -12deg;
+}
+.pass-card .stamp.down { animation: stamp .45s cubic-bezier(.5,0,.6,1.4) forwards; }
+@keyframes stamp { 0% { opacity: 0; scale: 2.4; } 70% { opacity: .95; scale: .92; } 100% { opacity: .9; scale: 1; } }
+.pass-form { display: grid; gap: 12px; width: min(320px, 100%); }
+.pass-form label { display: grid; gap: 4px; font-size: .85rem; color: var(--ink-soft); }
+.pass-form input, .pass-form select, .cal-form input, .cal-form select {
+  font: inherit; color: var(--ink); background: var(--paper-2); border: 1px solid var(--rule); border-radius: 2px; padding: 8px 10px; width: 100%;
+}
+.benefits { display: grid; gap: 14px; margin-bottom: 28px; padding: 0; }
+.benefits li { list-style: none; display: grid; grid-template-columns: 30px 1fr; gap: 12px; }
+.benefits li b { font-family: var(--f-brush); font-size: 1.4rem; color: var(--cinnabar); line-height: 1.2; }
+.benefits li span { color: var(--ink-soft); }
+.benefits li strong { color: var(--ink); font-weight: 600; }
+
+/* coin split */
+.split { border-top: 1px solid var(--rule); padding-top: 20px; }
+.split h3 { font-size: var(--step-1); }
+.coins { display: flex; gap: 6px; flex-wrap: wrap; margin-block: 14px 10px; }
+.coin {
+  width: 34px; height: 34px; border-radius: 50%; position: relative;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--k) 60%, #fff7d6), var(--k) 70%);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--k) 70%, #000);
+  transition: background .3s;
+}
+.coin::after { content: ""; position: absolute; inset: 11px; background: var(--paper); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--k) 70%, #000); }
+.coin.soc { --k: var(--cinnabar); }
+.coin.pot { --k: var(--gold); }
+.split-legend { display: flex; gap: 20px; flex-wrap: wrap; font-variant-numeric: tabular-nums; font-size: .92rem; }
+.split-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+.split input[type=range] { width: 100%; accent-color: var(--cinnabar); margin-top: 12px; }
+.compare { margin-top: 22px; overflow-x: auto; }
+.compare table { width: 100%; border-collapse: collapse; font-size: .92rem; min-width: 360px; }
+.compare th, .compare td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); }
+.compare th { font-family: var(--f-brush); font-weight: 700; }
+
+/* freshers guide */
+.exits { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 28px; }
+@media (max-width: 760px) { .exits { grid-template-columns: 1fr; } }
+.exit-list { display: grid; gap: 6px; align-content: start; }
+@media (max-width: 760px) { .exit-list { grid-template-columns: repeat(3, 1fr); } }
+.exit-list button {
+  display: grid; grid-template-columns: 30px 36px 1fr; gap: 8px; align-items: center; text-align: left;
+  background: none; border: 1px solid transparent; padding: 8px 10px; border-radius: 2px;
+}
+@media (max-width: 760px) { .exit-list button { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 2px; } .exit-list .x-name { font-size: .78rem; } }
+.exit-list button[aria-selected="true"] { border-color: var(--ink); background: var(--paper-2); }
+.x-letter { font-family: var(--f-mono); font-size: .8rem; background: var(--ink); color: var(--paper); width: 26px; height: 26px; display: grid; place-items: center; border-radius: 2px; }
+.x-zh { font-family: var(--f-brush); font-size: 1.6rem; line-height: 1; color: var(--cinnabar); }
+.x-name { font-size: .92rem; }
+.exit-page { background: var(--paper-2); padding: 28px; min-height: 240px; position: relative; overflow: hidden; }
+.exit-page .watermark { position: absolute; right: 12px; top: -10px; font-family: var(--f-brush); font-size: 9rem; line-height: 1; opacity: .07; pointer-events: none; }
+.exit-page h3 { font-size: var(--step-2); margin-bottom: 12px; position: relative; }
+.exit-page p { max-width: 62ch; position: relative; }
+.exit-page .tip { margin-top: 16px; font-size: .88rem; color: var(--ink-soft); position: relative; }
+.script-switch { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; font-size: .85rem; color: var(--ink-soft); }
+
+/* committees almanac */
+.almanac { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 900px) { .almanac { grid-template-columns: 1fr; } }
+.cal-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
+.cal-head h3 { font-size: var(--step-2); }
+.cal-nav { display: flex; gap: 6px; }
+.cal-nav button { border: 1px solid var(--rule); background: none; padding: 2px 10px; border-radius: 2px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1.5px solid var(--ink); border-left: 1px solid var(--rule); }
+.cal .dow { font-family: var(--f-brush); text-align: center; padding: 6px 0; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); font-size: .9rem; color: var(--ink-soft); }
+.cal .day {
+  min-height: 78px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 4px 5px; position: relative;
+  background: none; border-top: 0; border-left: 0; text-align: left; display: flex; flex-direction: column; gap: 3px; min-width: 0;
+}
+.cal .day:hover { background: var(--paper-2); }
+.cal .day.sel { background: var(--paper-2); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.cal .day.out { opacity: .3; pointer-events: none; }
+.cal .day .n { font-variant-numeric: tabular-nums; font-size: .82rem; }
+.cal .day.wk .n { color: var(--cinnabar); }
+.cal .ev { font-size: .66rem; line-height: 1.2; padding: 1px 4px; border-radius: 2px; color: #fff6df; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal .ji {
+  position: absolute; right: 4px; top: 4px; width: 22px; height: 22px; font-size: .85rem; rotate: 8deg;
+}
+@media (max-width: 520px) { .cal .day { min-height: 58px; } .cal .ev { font-size: 0; height: 6px; padding: 0; } }
+.cal-side { display: grid; gap: 18px; }
+.warn { border: 1.5px solid var(--cinnabar); padding: 14px 16px; display: grid; gap: 6px; }
+.warn h4 { margin: 0; font-family: var(--f-brush); font-size: 1.15rem; color: var(--cinnabar); display: flex; gap: 8px; align-items: center; }
+.warn p { font-size: .9rem; }
+.ok { border: 1.5px solid var(--jade); padding: 14px 16px; color: var(--jade); font-family: var(--f-brush); }
+.cal-form { display: grid; gap: 10px; background: var(--paper-2); padding: 16px; }
+.cal-form h4 { margin: 0; font-family: var(--f-brush); font-size: 1.1rem; }
+.cal-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cal-form label { display: grid; gap: 4px; font-size: .8rem; color: var(--ink-soft); }
+
+/* 起承轉合 */
+.phases { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 48px; border-top: 1.5px solid var(--ink); }
+@media (max-width: 760px) { .phases { grid-template-columns: 1fr; } }
+.phase { background: none; border: 0; border-bottom: 1px solid var(--rule); text-align: left; padding: 18px 16px 18px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
+@media (min-width: 761px) { .phase + .phase { padding-left: 16px; border-left: 1px solid var(--rule); } }
+.phase .ph-zh { font-family: var(--f-brush); font-size: 3rem; line-height: 1; color: var(--ink-soft); transition: color .3s; }
+.phase[aria-expanded="true"] .ph-zh, .phase:hover .ph-zh { color: var(--cinnabar); }
+.phase h4 { margin: 0; font-family: var(--f-brush); font-size: 1.2rem; }
+.phase .when { font-family: var(--f-mono); font-size: .74rem; color: var(--ink-soft); letter-spacing: .06em; }
+.phase .now { font-family: var(--f-mono); font-size: .66rem; letter-spacing: .12em; background: var(--cinnabar); color: var(--cinnabar-ink); padding: 1px 6px; justify-self: start; }
+.phase ul { margin: 6px 0 0; padding-left: 18px; font-size: .9rem; color: var(--ink-soft); display: none; }
+.phase[aria-expanded="true"] ul { display: block; }
+
+footer { padding-block: 40px; font-size: .88rem; color: var(--ink-soft); }
+footer .wrap { display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="seal">同</span><b>TONG Manchester</b></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#societies" data-i18n="nav.soc">Societies</a>
+      <a href="#whatson" data-i18n="nav.ev">What's on</a>
+      <a href="#pass" data-i18n="nav.pass">Joint Pass</a>
+      <a href="#guide" data-i18n="nav.guide">Freshers guide</a>
+      <a href="#committees" data-i18n="nav.com">Committees</a>
+    </nav>
+    <div class="tools">
+      <div class="seg" role="group" aria-label="Language">
+        <button data-lang="en" aria-pressed="true">EN</button>
+        <button data-lang="hant" aria-pressed="false">繁</button>
+        <button data-lang="hans" aria-pressed="false">简</button>
+      </div>
+      <button class="icon-btn" id="soundBtn" aria-pressed="false" title="Lantern chimes (pentatonic 五音)">五音</button>
+      <button class="icon-btn" id="themeBtn" title="Day or lantern night">夜</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <canvas id="inkCanvas" aria-hidden="true"></canvas>
+    <div class="wrap hero-inner">
+      <div class="hero-title">
+        <div class="big-tong"><span>同</span></div>
+        <div class="vertical">曼徹斯特 · 華人學會聯盟</div>
+        <span class="seal" aria-hidden="true">同行</span>
+      </div>
+      <h1 data-i18n="hero.h">Every Chinese and Hong Kong society in Manchester, on one string of lanterns.</h1>
+      <p class="lede" data-i18n="hero.p">One shared calendar, one membership pass and one freshers guide for students at MMU and the University of Manchester.</p>
+      <div class="cta">
+        <a class="btn red" href="#whatson" data-i18n="hero.c1">See what's on</a>
+        <a class="btn" href="#pass" data-i18n="hero.c2">Get the Joint Pass</a>
+      </div>
+      <div class="lantern-row" id="lanterns">
+        <svg class="rope" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><path id="ropePath" d=""></path></svg>
+      </div>
+      <p class="hint" data-i18n="hero.hint">Tap a lantern to visit its society. Click the paper to drop ink.</p>
+    </div>
+  </section>
+
+  <!-- THREE STOPS -->
+  <section class="panel">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="seal">三</span>
+        <div><h2 data-i18n="steps.h">Three steps to every society</h2></div>
+      </div>
+      <ol class="steps">
+        <li><span class="num">一</span><div><h3 data-i18n="s1.h">Join your home society</h3><p data-i18n="s1.p">Sign up through your students' union, as you would anyway.</p></div></li>
+        <li><span class="num">二</span><div><h3 data-i18n="s2.h">Add the Joint Pass</h3><p data-i18n="s2.p">Tick it at checkout, or add it later. It costs £5 for the year.</p></div></li>
+        <li><span class="num">三</span><div><h3 data-i18n="s3.h">Show it anywhere</h3><p data-i18n="s3.p">Show the pass at any partner event and pay the member price.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- SOCIETIES -->
+  <section class="panel" id="societies">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="seal">社</span>
+        <div><h2 data-i18n="soc.h">The societies</h2><p data-i18n="soc.p">Each society hangs its own scroll. Open one to read more.</p></div>
+      </div>
+      <div class="scrolls" id="scrolls"></div>
+    </div>
+  </section>
+
+  <!-- WHAT'S ON -->
+  <section class="panel" id="whatson">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="seal">榜</span>
+        <div><h2 data-i18n="ev.h">What's on</h2><p data-i18n="ev.p">The notice board for every partner society. Pass holders pay the member price everywhere.</p></div>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="Filter by society"></div>
+      <div class="board"><table>
+        <thead><tr><th data-i18n="ev.date">Date</th><th data-i18n="ev.event">Event</th><th data-i18n="ev.lines">Societies</th><th data-i18n="ev.where">Where</th><th data-i18n="ev.price">With pass</th></tr></thead>
+        <tbody id="evBody"></tbody>
+      </table></div>
+      <p class="note" data-i18n="ev.note">Example listings. Committees still need to confirm dates, venues and prices.</p>
+
+      <div class="gala" style="margin-top:40px">
+        <div>
+          <span class="eyebrow" style="color:inherit;opacity:.8">丁未 · Year of the Goat</span>
+          <h3 data-i18n="gala.h">Lunar New Year Gala 2027</h3>
+          <p data-i18n="gala.p">Saturday 13 February 2027 · all societies, one night</p>
+          <button class="btn" id="fireBtn" data-i18n="gala.btn">Light the firecrackers</button>
+        </div>
+        <div class="clock" id="clock" aria-live="off">
+          <div><b id="cD">–</b><span data-i18n="t.d">days</span></div>
+          <div><b id="cH">–</b><span data-i18n="t.h">hrs</span></div>
+          <div><b id="cM">–</b><span data-i18n="t.m">min</span></div>
+          <div><b id="cS">–</b><span data-i18n="t.s">sec</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASS -->
+  <section class="panel" id="pass">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="seal">通</span>
+        <div><h2 data-i18n="pass.h">The Joint Pass</h2><p data-i18n="pass.p">One £5 pass, sealed by your home society, honoured by all of them.</p></div>
+      </div>
+      <div class="pass-grid">
+        <div class="envelope-stage">
+          <button class="envelope" id="envelope" aria-label="Open the red envelope">
+            <div class="env-back"></div>
+            <div class="pass-card" id="passCard">
+              <div><div class="pc-title">同 TONG Joint Pass</div><div class="pc-sub">26/27 · MANCHESTER</div></div>
+              <canvas id="qr" width="21" height="21" aria-hidden="true"></canvas>
+              <div class="pc-name" id="pcName">Your name</div>
+              <div class="pc-foot"><span id="pcSoc">Home society: not sealed</span><span>DEMO</span></div>
+              <span class="seal stamp" id="stamp">港</span>
+            </div>
+            <div class="env-flap"></div>
+            <div class="env-front"><div class="fu"><span>福</span></div></div>
+          </button>
+          <p class="hint" id="envHint" data-i18n="pass.tap">Tap the red envelope to open it.</p>
+          <form class="pass-form" id="passForm">
+            <label for="pName"><span data-i18n="pass.name">Name on the pass</span><input id="pName" maxlength="28" placeholder="Chan Tai Man" autocomplete="off"></label>
+            <label for="pSoc"><span data-i18n="pass.soc">Home society</span><select id="pSoc"></select></label>
+            <button class="btn red" type="submit" data-i18n="pass.seal">Press the seal</button>
+          </form>
+        </div>
+        <div>
+          <ul class="benefits">
+            <li><b>價</b><span data-i18n-html="b1"><strong>Member prices</strong> at every partner society's events.</span></li>
+            <li><b>惠</b><span data-i18n-html="b2"><strong>Sponsor deals</strong> at Chinatown restaurants and shops (to be confirmed).</span></li>
+            <li><b>先</b><span data-i18n-html="b3"><strong>Early access</strong> to flagship tickets, including the gala.</span></li>
+            <li><b>回</b><span data-i18n-html="b4"><strong>Fees go back</strong> to the societies, not to a middleman.</span></li>
+          </ul>
+          <div class="split">
+            <h3 data-i18n="split.h">Where your £5 goes</h3>
+            <div class="coins" id="coins" aria-hidden="true"></div>
+            <div class="split-legend">
+              <span><i style="background:var(--cinnabar)"></i><span data-i18n="split.soc">Selling society</span> <b id="splitSoc">£3.50</b></span>
+              <span><i style="background:var(--gold)"></i><span data-i18n="split.pot">Shared pot</span> <b id="splitPot">£1.50</b></span>
+            </div>
+            <label for="splitRange" class="hint" style="display:block;margin-top:12px" data-i18n="split.try">Suggested split. Drag to try others.</label>
+            <input type="range" id="splitRange" min="50" max="90" step="10" value="70">
+            <p class="note" data-i18n="split.note">The shared pot pays for the website, wallet passes and gala deposits.</p>
+          </div>
+          <div class="compare">
+            <table>
+              <thead><tr><th></th><th data-i18n="cmp.d">Digital pass</th><th data-i18n="cmp.p">Printed card</th></tr></thead>
+              <tbody>
+                <tr><td data-i18n="cmp.r1">Cost per member</td><td>£0</td><td data-i18n="cmp.r1p">About 40p</td></tr>
+                <tr><td data-i18n="cmp.r2">Lost at a night out</td><td data-i18n="cmp.r2d">Re-download</td><td data-i18n="cmp.r2p">Gone</td></tr>
+                <tr><td data-i18n="cmp.r3">Checked at the door</td><td data-i18n="cmp.r3d">Committee scans it</td><td data-i18n="cmp.r3p">Eyeballed</td></tr>
+                <tr><td data-i18n="cmp.r4">Plan</td><td><b data-i18n="cmp.r4d">Default</b></td><td data-i18n="cmp.r4p">Only if sponsors ask</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIDE -->
+  <section class="panel" id="guide">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="seal">新</span>
+        <div><h2 data-i18n="guide.h">Freshers guide</h2><p data-i18n="guide.p">Six exits from the station, each with a short read. The language switch at the top changes the script.</p></div>
+      </div>
+      <div class="script-switch"><span data-i18n="guide.read">Reading in:</span><div class="seg" role="group" aria-label="Guide script">
+        <button data-lang="en" aria-pressed="true">English</button>
+        <button data-lang="hant" aria-pressed="false">繁體 · HK TW MO</button>
+        <button data-lang="hans" aria-pressed="false">简体 · CN MY</button>
+      </div></div>
+      <div class="exits">
+        <div class="exit-list" role="tablist" id="exitList"></div>
+        <article class="exit-page" id="exitPage" role="tabpanel"></article>
+      </div>
+      <p class="note" data-i18n="guide.note">Draft guide. Check opening times and services before you rely on them.</p>
+    </div>
+  </section>
+
+  <!-- COMMITTEES -->
+  <section class="panel" id="committees">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="seal">幹</span>
+        <div><h2 data-i18n="com.h">Committee almanac</h2><p data-i18n="com.p">A shared planning calendar. Pick a day and add a draft event. Two societies on the same evening get marked 忌 (avoid).</p></div>
+      </div>
+      <div class="almanac">
+        <div>
+          <div class="cal-head">
+            <h3 id="calTitle">November 2026</h3>
+            <div class="cal-nav"><button id="calPrev" aria-label="Previous month">‹</button><button id="calNext" aria-label="Next month">›</button></div>
+          </div>
+          <div class="cal" id="cal"></div>
+        </div>
+        <div class="cal-side">
+          <div id="clashes"></div>
+          <form class="cal-form" id="calForm">
+            <h4 id="calFormTitle">Add a draft for Sat 21 Nov</h4>
+            <label for="cfTitle"><span data-i18n="cf.t">Event</span><input id="cfTitle" maxlength="40" placeholder="Hotpot social" required></label>
+            <div class="row">
+              <label for="cfSoc"><span data-i18n="cf.s">Society</span><select id="cfSoc"></select></label>
+              <label for="cfTime"><span data-i18n="cf.w">When</span><select id="cfTime"><option value="eve">Evening</option><option value="day">Daytime</option></select></label>
+            </div>
+            <button class="btn red" type="submit" data-i18n="cf.add">Add to almanac</button>
+          </form>
+          <p class="note" data-i18n="com.note">What committees share: one calendar, one contact list and one sponsor pitch. Drafts live only in this browser.</p>
+        </div>
+      </div>
+
+      <div class="phases" id="phases"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><span class="seal" style="width:24px;height:24px;font-size:14px;vertical-align:middle;margin-right:8px">同</span><span data-i18n="foot">A student-run concept mockup, October 2026. Not an official university site.</span></span>
+    <span>EN · 繁 · 简</span>
+  </div>
+</footer>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("tong." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem("tong." + k, JSON.stringify(v)); } catch {} }
+  };
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  /* ── data ─────────────────────────────── */
+  const SOCS = [
+    { id: "hk", char: "港", color: "--cinnabar", en: "Hong Kong Society", hant: "香港學會", hans: "香港学会", inst: "MMU",
+      d: { en: "Food crawls, board games and movie nights, plus sponsor discounts around Chinatown.", hant: "美食團、桌遊和電影夜，仲有唐人街商戶折扣。", hans: "美食团、桌游和电影夜，还有唐人街商户折扣。" },
+      tags: ["Food", "Games", "Movie nights"] },
+    { id: "mabc", char: "算", color: "--jade", en: "MMU ABACUS", hant: "都大算盤社", hans: "都大算盘社", inst: "MMU",
+      d: { en: "A community for British Chinese and East and Southeast Asian students. Membership is £4.", hant: "英籍華人及東亞、東南亞學生的社群。會費 £4。", hans: "英籍华人及东亚、东南亚学生的社群。会费 £4。" },
+      tags: ["BCESEA", "£4 membership"] },
+    { id: "uabc", char: "盤", color: "--indigo", en: "UoM ABACUS", hant: "曼大算盤社", hans: "曼大算盘社", inst: "University of Manchester",
+      d: { en: "The Oxford Road branch of a UK-wide network. Link to come.", hant: "全英網絡嘅牛津路分會。連結稍後公佈。", hans: "全英网络的牛津路分会。链接稍后公布。" },
+      tags: ["UK network", "Link to come"] },
+    { id: "echo", char: "韻", color: "--gold", en: "Echoes of China", hant: "華韻社", hans: "华韵社", inst: "University to be confirmed",
+      d: { en: "Culture and heritage. Leads the festival workshops and the Lunar New Year gala. Link to come.", hant: "文化與傳承。負責節慶工作坊同新春晚會。連結稍後公佈。", hans: "文化与传承。负责节庆工作坊和新春晚会。链接稍后公布。" },
+      tags: ["Calligraphy", "Festivals", "Gala"] }
+  ];
+  const socById = id => SOCS.find(s => s.id === id);
+
+  const EVENTS = [
+    { date: "2026-10-21", t: { en: "Mahjong and milk tea night", hant: "麻雀奶茶夜", hans: "麻将奶茶夜" }, socs: ["hk"], where: "MMU Students' Union", price: 2, full: 4 },
+    { date: "2026-10-24", t: { en: "Inter-uni freshers mixer", hant: "跨校迎新聚會", hans: "跨校迎新聚会" }, socs: ["hk", "mabc", "uabc", "echo"], where: "Chinatown", price: 3, full: 6, flag: true },
+    { date: "2026-10-29", t: { en: "Dumpling-making workshop", hant: "包餃子工作坊", hans: "包饺子工作坊" }, socs: ["uabc"], where: "Oxford Road", price: 3, full: 5 },
+    { date: "2026-11-07", t: { en: "Calligraphy and tea afternoon", hant: "書法品茶下午", hans: "书法品茶下午" }, socs: ["echo"], where: "Venue TBC", price: 0, full: 3 },
+    { date: "2026-11-13", t: { en: "Bubble tea crawl", hant: "珍珠奶茶巡禮", hans: "珍珠奶茶巡礼" }, socs: ["mabc"], where: "Chinatown", price: 2, full: 4 },
+    { date: "2026-11-21", t: { en: "Karaoke night", hant: "K歌之夜", hans: "K歌之夜" }, socs: ["hk"], where: "Chinatown", price: 5, full: 8 },
+    { date: "2026-11-21", t: { en: "Bowling night", hant: "保齡球之夜", hans: "保龄球之夜" }, socs: ["uabc"], where: "Printworks", price: 4, full: 7 },
+    { date: "2026-12-21", t: { en: "Winter solstice tangyuan", hant: "冬至湯圓", hans: "冬至汤圆" }, socs: ["mabc", "echo"], where: "Venue TBC", price: 1, full: 3 },
+    { date: "2027-02-13", t: { en: "Lunar New Year Gala", hant: "新春晚會", hans: "新春晚会" }, socs: ["hk", "mabc", "uabc", "echo"], where: "Venue TBC", price: 15, full: 22, flag: true }
+  ];
+
+  const EXITS = [
+    { L: "A", zh: "食", name: { en: "Chinatown eats", hant: "唐人街食肆", hans: "唐人街美食" },
+      body: { en: "Chinatown sits around Faulkner Street, under the big paifang arch. Dim sum is busiest on weekend late mornings, so go before 11. Most places take cards, but bakeries often prefer cash.",
+              hant: "唐人街喺 Faulkner Street 一帶，就喺大牌坊下面。週末早上飲茶最多人，十一點前去最好。大部分餐廳收卡，但餅店多數鍾意現金。",
+              hans: "唐人街在 Faulkner Street 一带，就在大牌坊下面。周末上午吃早茶人最多，最好十一点前去。大部分餐厅可以刷卡，但面包店多半更喜欢现金。" },
+      tip: { en: "Pass holders: watch for sponsor discounts here once deals are signed.", hant: "持證人：簽好贊助後，留意呢度嘅折扣。", hans: "持证人：赞助签好后，留意这里的折扣。" } },
+    { L: "B", zh: "貨", name: { en: "Asian groceries", hant: "亞洲超市", hans: "亚洲超市" },
+      body: { en: "Wing Yip on Oldham Road is the big one for rice, sauces and frozen dumplings. The small supermarkets in Chinatown are handy for top-ups between lectures.",
+              hant: "Oldham Road 嘅榮業行最大，米、醬料、急凍餃子一應俱全。唐人街啲小超市啱晒堂與堂之間補貨。",
+              hans: "Oldham Road 的荣业行最大，大米、酱料、速冻饺子一应俱全。唐人街的小超市适合课间补货。" },
+      tip: { en: "Split a big shop with flatmates and take a taxi back.", hant: "同室友夾份大採購，再一齊搭的士返去。", hans: "和室友一起大采购，再拼车回去。" } },
+    { L: "C", zh: "銀", name: { en: "Bank and phone", hant: "銀行與電話", hans: "银行与电话" },
+      body: { en: "Open a UK bank account once you have your enrolment letter. App-only banks are usually the quickest. A SIM-only plan is cheaper than a phone contract.",
+              hant: "收到註冊信之後就可以開英國銀行戶口，純手機銀行通常最快。淨 SIM 卡月費計劃比手機合約平。",
+              hans: "拿到注册信后就可以开英国银行账户，纯手机银行通常最快。纯 SIM 卡套餐比手机合约便宜。" },
+      tip: { en: "Keep your passport and BRP or eVisa share code ready.", hant: "準備好護照同 eVisa 分享碼。", hans: "准备好护照和 eVisa 分享码。" } },
+    { L: "D", zh: "醫", name: { en: "Doctors and wellbeing", hant: "睇醫生與身心健康", hans: "看医生与身心健康" },
+      body: { en: "Register with a GP near where you live in your first few weeks. Call NHS 111 for urgent advice that isn't an emergency, and 999 for emergencies. Both universities run free counselling.",
+              hant: "頭幾個星期就要喺住所附近登記 GP。非緊急但急需建議就打 NHS 111，緊急情況打 999。兩間大學都有免費輔導服務。",
+              hans: "开学头几周就要在住处附近登记 GP。非紧急但需要建议就打 NHS 111，紧急情况打 999。两所大学都提供免费心理咨询。" },
+      tip: { en: "Registering early means you are not searching while ill.", hant: "早啲登記，唔使病咗先四圍搵。", hans: "早点登记，免得生病时才到处找。" } },
+    { L: "E", zh: "行", name: { en: "Getting around", hant: "交通", hans: "交通" },
+      body: { en: "Oxford Road is one of Europe's busiest bus corridors and links both universities with the city centre. Check Bee Network fares for student tickets before you buy weekly passes.",
+              hant: "牛津路係歐洲最繁忙嘅巴士走廊之一，連接兩間大學同市中心。買週票之前，先睇吓 Bee Network 嘅學生票價。",
+              hans: "牛津路是欧洲最繁忙的公交走廊之一，连接两所大学和市中心。买周票之前，先查一下 Bee Network 的学生票价。" },
+      tip: { en: "Walking from MMU to UoM along Oxford Road takes about 15 minutes.", hant: "沿牛津路由都大行去曼大大約十五分鐘。", hans: "沿牛津路从都大步行到曼大大约十五分钟。" } },
+    { L: "F", zh: "友", name: { en: "Finding your people", hant: "搵朋友", hans: "找朋友" },
+      body: { en: "Join your home society through your students' union, then add the Joint Pass. You get member prices at every partner society's events, so trying a new crowd costs less.",
+              hant: "經學生會加入你所屬嘅學會，再加購聯合通行證。去任何合作學會嘅活動都係會員價，識新朋友更抵。",
+              hans: "通过学生会加入你所属的学会，再加购联合通行证。参加任何合作学会的活动都是会员价，认识新朋友更划算。" },
+      tip: { en: "The inter-uni mixer on Saturday 24 October is the easiest first step.", hant: "十月二十四日（六）嘅跨校迎新聚會係最易嘅第一步。", hans: "十月二十四日（周六）的跨校迎新聚会是最容易的第一步。" } }
+  ];
+
+  const PHASES = [
+    { zh: "起", en: "Pitch", when: "Oct–Dec 2026", from: "2026-10-01", to: "2026-12-31",
+      items: ["Pitch the Hong Kong Society committee", "Meet the other committees", "Ask both students' unions", "Pick a name"] },
+    { zh: "承", en: "Soft launch", when: "Jan–Feb 2027", from: "2027-01-01", to: "2027-02-28",
+      items: ["Site and committee hub go live", "Lunar New Year Gala on 13 February"] },
+    { zh: "轉", en: "Pass pilot", when: "Mar–Jun 2027", from: "2027-03-01", to: "2027-06-30",
+      items: ["Joint Pass on sale", "First sponsor discounts", "Count sign-ups"] },
+    { zh: "合", en: "Full launch", when: "Sep 2027", from: "2027-09-01", to: "2027-09-30",
+      items: ["Pass sold at freshers", "Guide goes live", "More societies invited"] }
+  ];
+
+  /* ── i18n ─────────────────────────────── */
+  const T = {
+    "nav.soc": ["Societies", "學會", "学会"], "nav.ev": ["What's on", "活動", "活动"], "nav.pass": ["Joint Pass", "聯合通行證", "联合通行证"],
+    "nav.guide": ["Freshers guide", "新生指南", "新生指南"], "nav.com": ["Committees", "幹事", "干事"],
+    "hero.h": ["Every Chinese and Hong Kong society in Manchester, on one string of lanterns.", "曼徹斯特每個華人同香港學會，掛喺同一串燈籠上。", "曼彻斯特每个华人和香港学会，挂在同一串灯笼上。"],
+    "hero.p": ["One shared calendar, one membership pass and one freshers guide for students at MMU and the University of Manchester.", "都會大學同曼徹斯特大學學生共用一個日曆、一張會員證、一本新生指南。", "都会大学和曼彻斯特大学学生共用一个日历、一张会员证、一本新生指南。"],
+    "hero.c1": ["See what's on", "睇活動", "看活动"], "hero.c2": ["Get the Joint Pass", "攞通行證", "领通行证"],
+    "hero.hint": ["Tap a lantern to visit its society. Click the paper to drop ink.", "撳燈籠去睇學會。撳宣紙滴墨。", "点灯笼查看学会。点宣纸滴墨。"],
+    "steps.h": ["Three steps to every society", "三步走遍所有學會", "三步走遍所有学会"],
+    "s1.h": ["Join your home society", "加入你嘅學會", "加入你的学会"], "s1.p": ["Sign up through your students' union, as you would anyway.", "照常經學生會報名。", "照常通过学生会报名。"],
+    "s2.h": ["Add the Joint Pass", "加購通行證", "加购通行证"], "s2.p": ["Tick it at checkout, or add it later. It costs £5 for the year.", "結帳時剔選，或者之後再加。全年 £5。", "结账时勾选，或之后再加。全年 £5。"],
+    "s3.h": ["Show it anywhere", "隨處出示", "随处出示"], "s3.p": ["Show the pass at any partner event and pay the member price.", "喺任何合作活動出示，即享會員價。", "在任何合作活动出示，即享会员价。"],
+    "soc.h": ["The societies", "各學會", "各学会"], "soc.p": ["Each society hangs its own scroll. Open one to read more.", "每個學會掛一幅卷軸，打開睇詳情。", "每个学会挂一幅卷轴，打开看详情。"],
+    "ev.h": ["What's on", "活動告示", "活动告示"], "ev.p": ["The notice board for every partner society. Pass holders pay the member price everywhere.", "所有合作學會嘅告示板。持證人處處會員價。", "所有合作学会的告示板。持证人处处会员价。"],
+    "ev.date": ["Date", "日期", "日期"], "ev.event": ["Event", "活動", "活动"], "ev.lines": ["Societies", "學會", "学会"], "ev.where": ["Where", "地點", "地点"], "ev.price": ["With pass", "持證價", "持证价"],
+    "ev.note": ["Example listings. Committees still need to confirm dates, venues and prices.", "示例活動，日期、地點同價錢有待幹事確認。", "示例活动，日期、地点和价格有待干事确认。"],
+    "gala.h": ["Lunar New Year Gala 2027", "2027 新春晚會", "2027 新春晚会"], "gala.p": ["Saturday 13 February 2027 · all societies, one night", "2027年2月13日（六）· 各學會同慶", "2027年2月13日（周六）· 各学会同庆"],
+    "gala.btn": ["Light the firecrackers", "燒炮仗", "放鞭炮"],
+    "t.d": ["days", "日", "天"], "t.h": ["hrs", "時", "时"], "t.m": ["min", "分", "分"], "t.s": ["sec", "秒", "秒"],
+    "pass.h": ["The Joint Pass", "聯合通行證", "联合通行证"], "pass.p": ["One £5 pass, sealed by your home society, honoured by all of them.", "一張 £5 通行證，由你嘅學會蓋印，所有學會通用。", "一张 £5 通行证，由你的学会盖章，所有学会通用。"],
+    "pass.tap": ["Tap the red envelope to open it.", "撳利是封打開佢。", "点红包打开它。"],
+    "pass.name": ["Name on the pass", "證上姓名", "证上姓名"], "pass.soc": ["Home society", "所屬學會", "所属学会"], "pass.seal": ["Press the seal", "蓋印", "盖章"],
+    "b1": ["<strong>Member prices</strong> at every partner society's events.", "所有合作學會活動享<strong>會員價</strong>。", "所有合作学会活动享<strong>会员价</strong>。"],
+    "b2": ["<strong>Sponsor deals</strong> at Chinatown restaurants and shops (to be confirmed).", "唐人街餐廳同商店<strong>贊助優惠</strong>（待定）。", "唐人街餐厅和商店<strong>赞助优惠</strong>（待定）。"],
+    "b3": ["<strong>Early access</strong> to flagship tickets, including the gala.", "重點活動（包括晚會）<strong>優先購票</strong>。", "重点活动（包括晚会）<strong>优先购票</strong>。"],
+    "b4": ["<strong>Fees go back</strong> to the societies, not to a middleman.", "<strong>費用歸返學會</strong>，冇中間人。", "<strong>费用回到学会</strong>，没有中间人。"],
+    "split.h": ["Where your £5 goes", "你嘅 £5 去咗邊", "你的 £5 去哪儿"], "split.soc": ["Selling society", "售出學會", "售出学会"], "split.pot": ["Shared pot", "公共基金", "公共基金"],
+    "split.try": ["Suggested split. Drag to try others.", "建議分配，可拖動試其他比例。", "建议分配，可拖动尝试其他比例。"],
+    "split.note": ["The shared pot pays for the website, wallet passes and gala deposits.", "公共基金支付網站、電子錢包通行證同晚會訂金。", "公共基金支付网站、电子钱包通行证和晚会订金。"],
+    "cmp.d": ["Digital pass", "電子證", "电子证"], "cmp.p": ["Printed card", "實體卡", "实体卡"],
+    "cmp.r1": ["Cost per member", "每人成本", "每人成本"], "cmp.r1p": ["About 40p", "約 40p", "约 40p"],
+    "cmp.r2": ["Lost at a night out", "夜遊遺失", "夜游丢失"], "cmp.r2d": ["Re-download", "重新下載", "重新下载"], "cmp.r2p": ["Gone", "冇咗", "没了"],
+    "cmp.r3": ["Checked at the door", "門口查驗", "门口查验"], "cmp.r3d": ["Committee scans it", "幹事掃碼", "干事扫码"], "cmp.r3p": ["Eyeballed", "目測", "目测"],
+    "cmp.r4": ["Plan", "方案", "方案"], "cmp.r4d": ["Default", "預設", "默认"], "cmp.r4p": ["Only if sponsors ask", "贊助商要求先做", "赞助商要求才做"],
+    "guide.h": ["Freshers guide", "新生指南", "新生指南"], "guide.p": ["Six exits from the station, each with a short read. The language switch at the top changes the script.", "車站六個出口，每個一篇短文。頂部語言掣可轉換字體。", "车站六个出口，每个一篇短文。顶部语言按钮可切换字体。"],
+    "guide.read": ["Reading in:", "閱讀語言：", "阅读语言："], "guide.note": ["Draft guide. Check opening times and services before you rely on them.", "初稿指南，請先核實營業時間同服務。", "初稿指南，请先核实营业时间和服务。"],
+    "com.h": ["Committee almanac", "幹事通勝", "干事通胜"], "com.p": ["A shared planning calendar. Pick a day and add a draft event. Two societies on the same evening get marked 忌 (avoid).", "共用策劃日曆。揀一日加草稿活動。同一晚有兩個學會就標「忌」。", "共用策划日历。选一天添加草稿活动。同一晚有两个学会就标「忌」。"],
+    "com.note": ["What committees share: one calendar, one contact list and one sponsor pitch. Drafts live only in this browser.", "幹事共用：一個日曆、一份通訊錄、一份贊助提案。草稿只存喺呢個瀏覽器。", "干事共用：一个日历、一份通讯录、一份赞助提案。草稿只保存在这个浏览器。"],
+    "cf.t": ["Event", "活動", "活动"], "cf.s": ["Society", "學會", "学会"], "cf.w": ["When", "時段", "时段"], "cf.add": ["Add to almanac", "加入通勝", "加入通胜"],
+    "foot": ["A student-run concept mockup, October 2026. Not an official university site.", "學生自發概念稿，2026年10月。非大學官方網站。", "学生自发概念稿，2026年10月。非大学官方网站。"]
+  };
+  const LI = { en: 0, hant: 1, hans: 2 };
+  let lang = store.get("lang", "en");
+  if (!(lang in LI)) lang = "en";
+  const tr = k => (T[k] || [k])[LI[lang]];
+  const nm = s => lang === "en" ? s.en : s[lang];
+
+  function applyLang() {
+    document.documentElement.lang = lang === "en" ? "en-GB" : lang === "hant" ? "zh-Hant-HK" : "zh-Hans";
+    $$("[data-i18n]").forEach(el => el.textContent = tr(el.dataset.i18n));
+    $$("[data-i18n-html]").forEach(el => el.innerHTML = tr(el.dataset.i18nHtml));
+    $$("[data-lang]").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+    renderLanterns(); renderScrolls(); renderFilters(); renderEvents(); renderExit(); renderSocSelects(); renderCal(); renderPhases(); updatePassCard();
+  }
+  $$("[data-lang]").forEach(b => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("lang", lang); applyLang(); }));
+
+  /* ── theme (晝 / 夜) ─────────────────── */
+  const themeBtn = $("#themeBtn");
+  const isDark = () => {
+    const t = document.documentElement.dataset.theme;
+    return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  };
+  const syncThemeBtn = () => { themeBtn.textContent = isDark() ? "晝" : "夜"; themeBtn.title = isDark() ? "Switch to day" : "Switch to lantern night"; };
+  themeBtn.addEventListener("click", () => { document.documentElement.dataset.theme = isDark() ? "light" : "dark"; syncThemeBtn(); paintInk(true); });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { syncThemeBtn(); paintInk(true); });
+  new MutationObserver(() => { syncThemeBtn(); paintInk(true); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  syncThemeBtn();
+
+  /* ── sound: 五音 pentatonic pluck ─────── */
+  let actx = null, soundOn = false;
+  const PENTA = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33]; // 宮 商 角 徵 羽 …
+  $("#soundBtn").addEventListener("click", e => {
+    soundOn = !soundOn; e.currentTarget.setAttribute("aria-pressed", soundOn);
+    if (soundOn) { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); pluck(3); } catch { soundOn = false; } }
+  });
+  function pluck(i, vol = .18) {
+    if (!soundOn || !actx) return;
+    const t = actx.currentTime, f = PENTA[i % PENTA.length];
+    const o = actx.createOscillator(), o2 = actx.createOscillator(), g = actx.createGain(), lp = actx.createBiquadFilter();
+    o.type = "triangle"; o2.type = "sine"; o.frequency.value = f; o2.frequency.value = f * 2.01;
+    lp.type = "lowpass"; lp.frequency.setValueAtTime(4000, t); lp.frequency.exponentialRampToValueAtTime(600, t + .8);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + 1.6);
+    o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(actx.destination);
+    o.start(t); o2.start(t); o.stop(t + 1.7); o2.stop(t + 1.7);
+  }
+
+  /* ── ink-wash hero canvas ─────────────── */
+  const ink = $("#inkCanvas"), ictx = ink.getContext("2d");
+  let ridges = [], drops = [], mistT = 0, W = 0, H = 0, dpr = 1;
+  function noise1(seed) { // smooth value noise
+    const pts = Array.from({ length: 24 }, (_, i) => Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453 % 1);
+    return x => { const i = Math.floor(x), f = x - i, a = Math.abs(pts[i % 24]), b = Math.abs(pts[(i + 1) % 24]); const s = f * f * (3 - 2 * f); return a + (b - a) * s; };
+  }
+  function sizeInk() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    const r = ink.getBoundingClientRect(); W = r.width; H = r.height;
+    ink.width = W * dpr; ink.height = H * dpr; ictx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ridges = [0, 1, 2, 3].map(k => {
+      const n = noise1(k + 3), n2 = noise1(k + 11);
+      const base = H * (.42 + k * .1), amp = H * (.16 - k * .02), freq = 3 + k * 1.6;
+      return { k, pts: Array.from({ length: 121 }, (_, i) => { const x = i / 120; return base - amp * (n(x * freq) * .8 + n2(x * freq * 3) * .25) - (k === 0 ? H * .12 * Math.exp(-((x - .78) ** 2) / .01) : 0); }) };
+    });
+    paintInk(true);
+  }
+  function paintInk(force) {
+    if (!W) return;
+    const inkC = css("--ink"), paper = css("--paper");
+    ictx.clearRect(0, 0, W, H);
+    // sun / moon
+    ictx.fillStyle = css("--cinnabar"); ictx.globalAlpha = isDark() ? .55 : .75;
+    ictx.beginPath(); ictx.arc(W * .82, H * .2, Math.min(W, H) * .07, 0, Math.PI * 2); ictx.fill();
+    ridges.forEach(r => {
+      const g = ictx.createLinearGradient(0, H * .2, 0, H);
+      g.addColorStop(0, inkC); g.addColorStop(.55, paper);
+      ictx.globalAlpha = .05 + r.k * .045; ictx.fillStyle = g;
+      ictx.beginPath(); ictx.moveTo(0, H);
+      r.pts.forEach((y, i) => ictx.lineTo(i / 120 * W, y + Math.sin(mistT * .3 + i * .2 + r.k) * (reduce ? 0 : .6)));
+      ictx.lineTo(W, H); ictx.closePath(); ictx.fill();
+    });
+    // mist bands
+    if (!reduce) for (let m = 0; m < 3; m++) {
+      const y = H * (.5 + m * .13), x = ((mistT * (8 + m * 5)) % (W + 600)) - 300;
+      const g = ictx.createRadialGradient(x, y, 0, x, y, 300);
+      g.addColorStop(0, paper); g.addColorStop(1, "transparent");
+      ictx.globalAlpha = .55; ictx.fillStyle = g; ictx.fillRect(x - 300, y - 60, 600, 120);
+    }
+    // ink drops
+    drops.forEach(d => {
+      const g = ictx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.r);
+      g.addColorStop(0, inkC); g.addColorStop(.6, inkC); g.addColorStop(1, "transparent");
+      ictx.globalAlpha = d.a; ictx.fillStyle = g;
+      ictx.beginPath();
+      for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2, rr = d.r * (1 + .12 * Math.sin(a * 5 + d.seed)); ictx.lineTo(d.x + Math.cos(a) * rr, d.y + Math.sin(a) * rr); }
+      ictx.fill();
+    });
+    ictx.globalAlpha = 1;
+  }
+  ink.addEventListener("pointerdown", e => {
+    const r = ink.getBoundingClientRect();
+    drops.push({ x: e.clientX - r.left, y: e.clientY - r.top, r: 2, max: 30 + Math.random() * 50, a: .5, seed: Math.random() * 9 });
+    if (drops.length > 30) drops.shift();
+    pluck(Math.floor(Math.random() * 7), .1);
+    if (reduce) { drops.at(-1).r = drops.at(-1).max; drops.at(-1).a = .25; paintInk(); }
+  });
+  let last = 0;
+  function loop(t) {
+    const dt = Math.min(.05, (t - last) / 1000); last = t; mistT += dt;
+    drops.forEach(d => { d.r += (d.max - d.r) * dt * 1.6; d.a = Math.max(.12, d.a - dt * .05); });
+    paintInk(); requestAnimationFrame(loop);
+  }
+  new ResizeObserver(sizeInk).observe(ink);
+  if (!reduce) requestAnimationFrame(loop);
+
+  /* ── lanterns ─────────────────────────── */
+  const SAG = { y0: 10, s: 46 };
+  const ropeY = t => SAG.y0 + 4 * SAG.s * t * (1 - t);
+  $("#ropePath").setAttribute("d", `M0 ${SAG.y0} Q500 ${SAG.y0 + 2 * SAG.s} 1000 ${SAG.y0}`);
+  function renderLanterns() {
+    const row = $("#lanterns");
+    $$(".lantern", row).forEach(l => l.remove());
+    const items = [...SOCS, { id: "yours", char: "？", en: "Your society next", hant: "下一個係你", hans: "下一个是你" }];
+    items.forEach((s, i) => {
+      const t = (i + 1) / (items.length + 1);
+      const b = document.createElement("button");
+      b.className = "lantern" + (s.id === "yours" ? " ghost" : "");
+      b.style.left = t * 100 + "%";
+      b.style.top = (ropeY(t) / 120 * 120) + "px";
+      b.style.animationDelay = (-i * .7) + "s";
+      b.innerHTML = `<span class="cord"></span><span class="body" style="${s.color ? `--c:var(${s.color})` : ""}">${s.char}</span><span class="tassel"></span><span class="lbl">${nm(s)}</span>`;
+      b.setAttribute("aria-label", `${s.en}: go to societies`);
+      b.addEventListener("pointerenter", () => pluck(i));
+      b.addEventListener("click", () => { b.classList.add("lit"); pluck(i + 2); openScroll(s.id); });
+      row.appendChild(b);
+    });
+  }
+
+  /* ── society scrolls ──────────────────── */
+  const openSet = new Set();
+  function renderScrolls() {
+    const wrap = $("#scrolls"); wrap.innerHTML = "";
+    SOCS.forEach(s => {
+      const el = document.createElement("div");
+      el.className = "scroll" + (openSet.has(s.id) ? " open" : ""); el.id = "scroll-" + s.id;
+      el.style.setProperty("--c", `var(${s.color})`);
+      el.innerHTML = `<div class="rod"></div><button class="face" aria-expanded="${openSet.has(s.id)}">
+        <div class="zh">${lang === "hans" ? s.hans : s.hant}</div>
+        <div class="en">${s.en}</div>
+        <div class="inst">${s.inst}</div>
+        <div class="more"><div><p>${s.d[lang]}</p><div class="tagline">${s.tags.map(t => `<span class="chip">${t}</span>`).join("")}</div></div></div>
+        <div class="pull"><span>${openSet.has(s.id) ? (lang === "en" ? "Roll up" : lang === "hant" ? "收起" : "收起") : (lang === "en" ? "Unroll" : lang === "hant" ? "展開" : "展开")}</span><span class="arrow">▾</span></div>
+      </button><div class="rod"></div>`;
+      $("button", el).addEventListener("click", () => { openSet.has(s.id) ? openSet.delete(s.id) : openSet.add(s.id); renderScrolls(); });
+      wrap.appendChild(el);
+    });
+    const y = document.createElement("div");
+    y.className = "scroll yours" + (openSet.has("yours") ? " open" : ""); y.id = "scroll-yours";
+    const yt = {
+      en: ["Your society", "Join for free. Message a founding committee, send one rep to the monthly meeting, then your events appear on the board."],
+      hant: ["你嘅學會", "免費加入。聯絡創始幹事，派一位代表出席每月會議，你嘅活動就會上告示板。"],
+      hans: ["你的学会", "免费加入。联系创始干事，派一位代表参加每月会议，你的活动就会上告示板。"]
+    }[lang];
+    y.innerHTML = `<div class="rod"></div><button class="face" aria-expanded="${openSet.has("yours")}"><div class="zh">？</div><div class="en">${yt[0]}</div><div class="inst">Any university</div>
+      <div class="more"><div><p>${yt[1]}</p></div></div><div class="pull"><span>${lang === "en" ? "How to add your lantern" : lang === "hant" ? "點樣掛燈籠" : "怎样挂灯笼"}</span><span class="arrow">▾</span></div></button><div class="rod"></div>`;
+    $("button", y).addEventListener("click", () => { openSet.has("yours") ? openSet.delete("yours") : openSet.add("yours"); renderScrolls(); });
+    wrap.appendChild(y);
+  }
+  function openScroll(id) {
+    openSet.add(id); renderScrolls();
+    const el = $("#scroll-" + id);
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+    el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1300);
+  }
+
+  /* ── events board ─────────────────────── */
+  let filter = store.get("filter", "all");
+  const WD = { en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], hant: ["日", "一", "二", "三", "四", "五", "六"], hans: ["日", "一", "二", "三", "四", "五", "六"] };
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+  const fmtDate = s => {
+    const d = parse(s), w = d.getUTCDay();
+    return lang === "en" ? [`${WD.en[w]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]}`, d.getUTCFullYear()]
+      : [`${d.getUTCMonth() + 1}月${d.getUTCDate()}日`, `${lang === "hant" ? "星期" : "周"}${WD[lang][w]} · ${d.getUTCFullYear()}`];
+  };
+  function renderFilters() {
+    const f = $("#filters"); f.innerHTML = "";
+    [{ id: "all", label: lang === "en" ? "All" : "全部" }, ...SOCS.map(s => ({ id: s.id, label: nm(s), c: s.color }))].forEach(o => {
+      const b = document.createElement("button"); b.textContent = o.label; b.setAttribute("aria-pressed", filter === o.id);
+      b.addEventListener("click", () => { filter = o.id; store.set("filter", filter); renderFilters(); renderEvents(); });
+      f.appendChild(b);
+    });
+  }
+  function renderEvents() {
+    const tb = $("#evBody"); tb.innerHTML = "";
+    EVENTS.forEach(e => {
+      const tr_ = document.createElement("tr");
+      if (filter !== "all" && !e.socs.includes(filter)) tr_.className = "hide";
+      const [d1, d2] = fmtDate(e.date);
+      tr_.innerHTML = `<td class="date">${d1}<small>${d2}</small></td>
+        <td><div class="title">${e.t[lang]}</div>${e.flag ? `<div class="flag">${lang === "en" ? "FLAGSHIP · ALL SOCIETIES" : "旗艦活動"}</div>` : ""}</td>
+        <td><div class="dots">${e.socs.map(id => { const s = socById(id); return `<span class="dot" style="background:var(${s.color})" title="${s.en}">${s.char}</span>`; }).join("")}</div></td>
+        <td>${e.where}</td>
+        <td class="price">${e.price ? "£" + e.price : (lang === "en" ? "Free" : "免費")} <s>£${e.full}</s></td>`;
+      tb.appendChild(tr_);
+    });
+  }
+
+  /* ── countdown + firecrackers ─────────── */
+  const GALA = Date.UTC(2027, 1, 13, 18, 0, 0); // 6pm GMT
+  function tick() {
+    let s = Math.max(0, Math.floor((GALA - Date.now()) / 1000));
+    const d = Math.floor(s / 86400); s -= d * 86400; const h = Math.floor(s / 3600); s -= h * 3600; const m = Math.floor(s / 60); s -= m * 60;
+    $("#cD").textContent = d; $("#cH").textContent = String(h).padStart(2, "0"); $("#cM").textContent = String(m).padStart(2, "0"); $("#cS").textContent = String(s).padStart(2, "0");
+  }
+  tick(); setInterval(tick, 1000);
+
+  const fx = $("#fx"), fctx = fx.getContext("2d"); let parts = [], fxRun = false;
+  function burst(x, y) {
+    const cols = [css("--cinnabar"), css("--gold"), "#ffd36b", "#ff7a4d"];
+    for (let i = 0; i < 70; i++) { const a = Math.random() * Math.PI * 2, v = 2 + Math.random() * 5; parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1.5, life: 1, c: cols[i % cols.length], s: 2 + Math.random() * 2.5 }); }
+    for (let i = 0; i < 6; i++) parts.push({ x, y, vx: (Math.random() - .5) * 3, vy: -3 - Math.random() * 3, life: 1.4, c: css("--cinnabar"), s: 7, paper: true });
+  }
+  function fxLoop() {
+    const w = fx.width = innerWidth, h = fx.height = innerHeight;
+    fctx.clearRect(0, 0, w, h);
+    parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .12; p.vx *= .985; p.life -= p.paper ? .008 : .016;
+      fctx.globalAlpha = Math.max(0, p.life); fctx.fillStyle = p.c;
+      if (p.paper) { fctx.save(); fctx.translate(p.x, p.y); fctx.rotate(p.life * 9); fctx.fillRect(-p.s / 2, -p.s, p.s, p.s * 2); fctx.restore(); }
+      else { fctx.beginPath(); fctx.arc(p.x, p.y, p.s * p.life, 0, Math.PI * 2); fctx.fill(); } });
+    parts = parts.filter(p => p.life > 0 && p.y < h + 20);
+    if (parts.length) requestAnimationFrame(fxLoop); else { fxRun = false; fctx.clearRect(0, 0, w, h); }
+  }
+  $("#fireBtn").addEventListener("click", e => {
+    if (reduce) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    [0, 180, 360, 540, 720].forEach((ms, i) => setTimeout(() => {
+      burst(r.left + r.width / 2 + (Math.random() - .5) * 260, r.top - 40 - Math.random() * 160); pluck(6 - i, .12);
+      if (!fxRun) { fxRun = true; requestAnimationFrame(fxLoop); }
+    }, ms));
+  });
+
+  /* ── pass: envelope, seal, coins ──────── */
+  const env = $("#envelope");
+  env.addEventListener("click", () => { env.classList.toggle("open"); env.setAttribute("aria-label", env.classList.contains("open") ? "Close the red envelope" : "Open the red envelope"); pluck(env.classList.contains("open") ? 4 : 1); });
+  function renderSocSelects() {
+    ["#pSoc", "#cfSoc"].forEach(sel => {
+      const el = $(sel), v = el.value || (sel === "#pSoc" ? passState.soc : "");
+      el.innerHTML = SOCS.map(s => `<option value="${s.id}">${nm(s)}</option>`).join("");
+      if (v) el.value = v;
+    });
+  }
+  let passState = store.get("pass", { name: "", soc: null });
+  function drawQR(seed) { // decorative, not a working code
+    const c = $("#qr"), x = c.getContext("2d"), N = 21; let h = 0;
+    for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    x.fillStyle = css("--paper"); x.fillRect(0, 0, N, N); x.fillStyle = css("--ink");
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) { h = (h * 1103515245 + 12345) >>> 0; if ((h >> 16) & 1) x.fillRect(i, j, 1, 1); }
+    [[0, 0], [14, 0], [0, 14]].forEach(([a, b]) => { x.fillStyle = css("--ink"); x.fillRect(a, b, 7, 7); x.fillStyle = css("--paper"); x.fillRect(a + 1, b + 1, 5, 5); x.fillStyle = css("--ink"); x.fillRect(a + 2, b + 2, 3, 3); });
+  }
+  function updatePassCard(animate) {
+    $("#pcName").textContent = passState.name || (lang === "en" ? "Your name" : "你的名字");
+    const s = passState.soc && socById(passState.soc);
+    $("#pcSoc").textContent = s ? (lang === "en" ? "Sealed by " : "蓋印：") + nm(s) : (lang === "en" ? "Home society: not sealed" : "未蓋印");
+    const st = $("#stamp");
+    if (s) { st.textContent = s.char; st.style.background = `var(${s.color})`; st.style.boxShadow = `inset 0 0 0 2px var(${s.color}), inset 0 0 0 3.5px var(--cinnabar-ink)`;
+      if (animate) { st.classList.remove("down"); void st.offsetWidth; } st.classList.add("down"); }
+    drawQR((passState.name || "tong") + (passState.soc || ""));
+  }
+  $("#pName").value = passState.name;
+  $("#pName").addEventListener("input", e => { passState.name = e.target.value; $("#pcName").textContent = passState.name || "Your name"; });
+  $("#passForm").addEventListener("submit", e => {
+    e.preventDefault();
+    passState = { name: $("#pName").value.trim(), soc: $("#pSoc").value }; store.set("pass", passState);
+    if (!env.classList.contains("open")) env.classList.add("open");
+    setTimeout(() => { updatePassCard(true); pluck(0, .25); }, env.classList.contains("open") ? 0 : 900);
+  });
+  function renderCoins() {
+    const pct = +$("#splitRange").value, n = pct / 10;
+    $("#coins").innerHTML = Array.from({ length: 10 }, (_, i) => `<span class="coin ${i < n ? "soc" : "pot"}"></span>`).join("");
+    $("#splitSoc").textContent = "£" + (5 * pct / 100).toFixed(2) + ` (${pct}%)`;
+    $("#splitPot").textContent = "£" + (5 * (100 - pct) / 100).toFixed(2) + ` (${100 - pct}%)`;
+  }
+  $("#splitRange").addEventListener("input", () => { renderCoins(); pluck(+$("#splitRange").value / 10 - 5); });
+  renderCoins();
+
+  /* ── freshers guide ───────────────────── */
+  let exitIdx = store.get("exit", 0);
+  function renderExit() {
+    const list = $("#exitList"); list.innerHTML = "";
+    EXITS.forEach((x, i) => {
+      const b = document.createElement("button"); b.setAttribute("role", "tab"); b.setAttribute("aria-selected", i === exitIdx);
+      b.innerHTML = `<span class="x-letter">${x.L}</span><span class="x-zh">${x.zh}</span><span class="x-name">${x.name[lang]}</span>`;
+      b.addEventListener("click", () => { exitIdx = i; store.set("exit", i); renderExit(); pluck(i); });
+      list.appendChild(b);
+    });
+    const x = EXITS[exitIdx];
+    $("#exitPage").innerHTML = `<span class="watermark" aria-hidden="true">${x.zh}</span>
+      <span class="eyebrow">${lang === "en" ? "Exit" : "出口"} ${x.L}</span>
+      <h3>${x.name[lang]}</h3><p>${x.body[lang]}</p><p class="tip">${x.tip[lang]}</p>`;
+  }
+
+  /* ── committee almanac ────────────────── */
+  let drafts = store.get("drafts", []);
+  let calMonth = { y: 2026, m: 10 }; // 0-based month: November
+  let selDay = "2026-11-21";
+  const allCalEvents = () => [...EVENTS.flatMap((e, k) => e.socs.length === SOCS.length ? [] : e.socs.map(s => ({ date: e.date, title: e.t[lang], soc: s, eve: true, key: "e" + k }))),
+    ...drafts.map((d, k) => ({ ...d, key: "d" + k }))];
+  const flagships = () => EVENTS.filter(e => e.socs.length === SOCS.length);
+  function clashesOn(date) {
+    const evs = allCalEvents().filter(e => e.date === date && e.eve);
+    // a joint event lists several societies but is one night; a clash is two separate events
+    const byKey = [...new Map(evs.map(e => [e.key, e])).values()];
+    return byKey.length > 1 && new Set(evs.map(e => e.soc)).size > 1 ? evs : null;
+  }
+  function renderCal() {
+    const { y, m } = calMonth;
+    $("#calTitle").textContent = lang === "en" ? `${["January","February","March","April","May","June","July","August","September","October","November","December"][m]} ${y}` : `${y}年${m + 1}月`;
+    const cal = $("#cal"); cal.innerHTML = "";
+    const dows = lang === "en" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] : ["一", "二", "三", "四", "五", "六", "日"];
+    dows.forEach(d => { const e = document.createElement("div"); e.className = "dow"; e.textContent = d; cal.appendChild(e); });
+    const first = new Date(Date.UTC(y, m, 1)), lead = (first.getUTCDay() + 6) % 7, days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    const cells = Math.ceil((lead + days) / 7) * 7;
+    const evs = allCalEvents();
+    for (let i = 0; i < cells; i++) {
+      const dn = i - lead + 1;
+      const b = document.createElement("button"); b.className = "day";
+      if (dn < 1 || dn > days) { b.className += " out"; b.tabIndex = -1; cal.appendChild(b); continue; }
+      const iso = `${y}-${String(m + 1).padStart(2, "0")}-${String(dn).padStart(2, "0")}`;
+      if (i % 7 >= 5) b.className += " wk";
+      if (iso === selDay) b.className += " sel";
+      let html = `<span class="n">${dn}</span>`;
+      flagships().filter(e => e.date === iso).forEach(e => html += `<span class="ev" style="background:var(--ink);color:var(--paper)">${e.t[lang]}</span>`);
+      evs.filter(e => e.date === iso).forEach(e => { const s = socById(e.soc); html += `<span class="ev" style="background:var(${s.color})" title="${s.en}: ${e.title}">${e.title}</span>`; });
+      if (clashesOn(iso)) html += `<span class="seal ji" title="Clash">忌</span>`;
+      b.innerHTML = html;
+      b.setAttribute("aria-label", iso + (clashesOn(iso) ? ", clash" : ""));
+      b.addEventListener("click", () => { selDay = iso; renderCal(); });
+      cal.appendChild(b);
+    }
+    // side
+    const all = new Set(evs.map(e => e.date)); const cl = [...all].filter(clashesOn).sort();
+    const box = $("#clashes");
+    if (cl.length) {
+      box.innerHTML = cl.map(d => { const list = clashesOn(d); const [d1] = fmtDate(d);
+        return `<div class="warn"><h4><span class="seal" style="width:24px;height:24px;font-size:.85rem">忌</span>${lang === "en" ? "Clash on " : "撞期："}${d1}</h4>
+          <p>${list.map(e => `<b>${nm(socById(e.soc))}</b>: ${e.title}`).join(lang === "en" ? " and " : "，")}.</p>
+          <p class="hint">${lang === "en" ? "Move one, or merge them into a joint night." : lang === "hant" ? "改期，或者合辦一晚。" : "改期，或者合办一晚。"}</p></div>`; }).join("");
+    } else box.innerHTML = `<div class="ok">宜 · ${lang === "en" ? "No clashes. Every evening has one society." : lang === "hant" ? "冇撞期。" : "没有撞期。"}</div>`;
+    const [sd] = fmtDate(selDay);
+    $("#calFormTitle").textContent = (lang === "en" ? "Add a draft for " : "新增草稿：") + sd;
+    $("#cfTime").innerHTML = lang === "en" ? `<option value="eve">Evening</option><option value="day">Daytime</option>` : `<option value="eve">晚上</option><option value="day">日間</option>`;
+  }
+  $("#calPrev").addEventListener("click", () => { calMonth.m--; if (calMonth.m < 0) { calMonth.m = 11; calMonth.y--; } renderCal(); });
+  $("#calNext").addEventListener("click", () => { calMonth.m++; if (calMonth.m > 11) { calMonth.m = 0; calMonth.y++; } renderCal(); });
+  $("#calForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const title = $("#cfTitle").value.trim(); if (!title) return;
+    drafts.push({ date: selDay, title, soc: $("#cfSoc").value, eve: $("#cfTime").value === "eve", draft: true });
+    store.set("drafts", drafts); $("#cfTitle").value = ""; renderCal(); pluck(clashesOn(selDay) ? 0 : 4);
+  });
+
+  /* ── 起承轉合 phases ──────────────────── */
+  let openPhase = null;
+  function renderPhases() {
+    const now = new Date().toISOString().slice(0, 10);
+    const cur = PHASES.findIndex(p => now >= p.from && now <= p.to);
+    if (openPhase === null) openPhase = cur >= 0 ? cur : 0;
+    const p_ = $("#phases"); p_.innerHTML = "";
+    PHASES.forEach((p, i) => {
+      const b = document.createElement("button"); b.className = "phase"; b.setAttribute("aria-expanded", i === openPhase);
+      b.innerHTML = `<span class="ph-zh">${p.zh}</span>${i === cur ? `<span class="now">${lang === "en" ? "NOW" : "現在"}</span>` : ""}<h4>${p.en}</h4><span class="when">${p.when}</span><ul>${p.items.map(t => `<li>${t}</li>`).join("")}</ul>`;
+      b.addEventListener("click", () => { openPhase = i; renderPhases(); pluck(i * 2); });
+      p_.appendChild(b);
+    });
+  }
+
+  applyLang();
+})();
+</script>
