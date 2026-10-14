@@ -1,4 +1,5 @@
 import { SOCS, socName } from "../data";
+import { GradientField, LiquidGlyph } from "../fx/Liquid";
 import { useApp, useT } from "../store";
 import { canWalk } from "./Header";
 
@@ -8,9 +9,10 @@ export default function Hero() {
   const setMode = useApp((s) => s.setMode);
   return (
     <section className="hero page-hero">
+      <GradientField className="hero-field" c1="#7a1410" c2="#c99a3a" c3="#1f4a44" bg="#0d0810" />
       <div className="wrap hero-inner">
         <div className="hero-title">
-          <div className="big-tong"><span>同</span></div>
+          <LiquidGlyph text="同" className="liquid-tong hero-glyph" glow={1.2} />
           <div className="vertical">曼徹斯特 · 華人學會聯盟</div>
           <span className="seal" aria-hidden="true">同行</span>
         </div>

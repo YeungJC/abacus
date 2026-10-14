@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { SOCS, socById, socName } from "../data";
 import { pluck } from "../lib/audio";
+import { LiquidGlyph } from "../fx/Liquid";
 import { useApp, useT } from "../store";
 import Committees from "../components/Committees";
 import Guide from "../components/Guide";
@@ -17,7 +18,7 @@ function Welcome() {
   return (
     <div className="welcome">
       <div className="hero-title">
-        <div className="big-tong"><span>同</span></div>
+        <LiquidGlyph text="同" className="liquid-tong" />
         <div className="vertical">曼徹斯特 · 華人學會聯盟</div>
       </div>
       <h1>{t("hero.h")}</h1>

@@ -7,6 +7,7 @@ import { useApp } from "../store";
 import Lantern from "./Lantern";
 import Shophouse, { GROUND, ridgeMat, tileMat } from "./Shophouse";
 import { stopById, type StopId } from "./stops";
+import { liquidGoldMaterial, silkMaterial } from "./Silk";
 import { BRUSH, canvasTex, fitText, SERIF, shade, signTex } from "./textures";
 
 /** Clicking anything inside walks you to that place. A drag to look around doesn't count. */
@@ -59,17 +60,25 @@ export function Gate() {
   const plaque = useMemo(
     () =>
       canvasTex(1024, 400, (c, w, h) => {
-        c.fillStyle = "#123a35"; c.fillRect(0, 0, w, h);
+        // black lacquer with a gold frame; the lettering is poured in liquid gold on top
+        const g = c.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, "#0f2c29"); g.addColorStop(1, "#071816");
+        c.fillStyle = g; c.fillRect(0, 0, w, h);
         c.strokeStyle = "#d8ad4e"; c.lineWidth = 16; c.strokeRect(14, 14, w - 28, h - 28);
         c.strokeStyle = "rgba(216,173,78,.5)"; c.lineWidth = 4; c.strokeRect(40, 40, w - 80, h - 80);
-        c.fillStyle = "#f6cf6e"; c.textAlign = "center"; c.textBaseline = "middle";
-        c.font = `700 210px ${BRUSH}`;
-        c.fillText("同  行", w / 2, h * 0.43);
-        c.font = `600 44px ${SERIF}`;
-        c.fillText("T O N G   M A N C H E S T E R", w / 2, h * 0.8);
       }),
     [],
   );
+  const lettering = useMemo(() => {
+    const mask = canvasTex(1024, 400, (c, w, h) => {
+      c.fillStyle = "#fff"; c.textAlign = "center"; c.textBaseline = "middle";
+      c.font = `700 210px ${BRUSH}`;
+      c.fillText("同  行", w / 2, h * 0.43);
+      c.font = `600 44px ${SERIF}`;
+      c.fillText("T O N G   M A N C H E S T E R", w / 2, h * 0.8);
+    });
+    return liquidGoldMaterial(mask, 1024 / 400);
+  }, []);
   const back = useMemo(
     () =>
       canvasTex(1024, 400, (c, w, h) => {
@@ -108,7 +117,10 @@ export function Gate() {
         <mesh position={[0, 6.05, 0]} material={red}><boxGeometry args={[6.4, 0.32, 0.4]} /></mesh>
         {[-1, 1].map((s) => <mesh key={s} position={[s * 3.5, 3.95, 0]} material={red}><boxGeometry args={[1.8, 0.26, 0.34]} /></mesh>)}
         {/* plaque */}
-        <Board tex={plaque} w={3.4} h={1.33} position={[0, 5.3, 0.22]} rotation={[0, 0, 0]} glow={0.75} />
+        <Board tex={plaque} w={3.4} h={1.33} position={[0, 5.3, 0.22]} rotation={[0, 0, 0]} glow={0.6} />
+        <mesh position={[0, 5.3, 0.23]} material={lettering} raycast={() => null}>
+          <planeGeometry args={[3.4, 1.33]} />
+        </mesh>
         <Board tex={back} w={3.4} h={1.33} position={[0, 5.3, -0.22]} rotation={[0, Math.PI, 0]} glow={0.6} />
         {/* dougong brackets under the eaves */}
         {Array.from({ length: 11 }, (_, i) => (
@@ -460,6 +472,13 @@ export function GalaStage({ lang }: { lang: Lang }) {
   const red = useMemo(() => new THREE.MeshStandardMaterial({ color: "#a3221a", roughness: 0.5, emissive: "#3a0603" }), []);
   const roof = useMemo(() => gateRoofGeo(10, 2.4), []);
   const fire = useApp((s) => s.fire);
+  const { drapeGeo, drapeL, drapeR, valanceGeo, valance } = useMemo(() => ({
+    drapeGeo: new THREE.PlaneGeometry(1.5, 5.4, 8, 30).translate(0, -2.7, 0),
+    drapeL: silkMaterial({ c1: "#9e1410", c2: "#e0a040", c3: "#5a0608", seed: 3, strength: 0.18, density: 1.4 }),
+    drapeR: silkMaterial({ c1: "#9e1410", c2: "#e0a040", c3: "#5a0608", seed: 11, strength: 0.18, density: 1.4 }),
+    valanceGeo: new THREE.PlaneGeometry(8.2, 0.8, 40, 6).translate(0, -0.4, 0),
+    valance: silkMaterial({ c1: "#c4291e", c2: "#f0c060", c3: "#7a0c0a", seed: 7, strength: 0.08, density: 2.2 }),
+  }), []);
   return (
     <Place id="gala">
       <group position={[0, 0, z]} onClick={(e) => { if (e.delta > 6 || useApp.getState().open !== "gala") return; e.stopPropagation(); fire(); }}>
@@ -473,6 +492,11 @@ export function GalaStage({ lang }: { lang: Lang }) {
         <mesh position={[0, 6.4, -1.9]} material={red}><boxGeometry args={[8.4, 0.36, 0.4]} /></mesh>
         <mesh geometry={roof} material={tileMat} position={[0, 6.75, -1.9]} />
         <mesh position={[0, 7.75, -1.9]} rotation={[0, 0, Math.PI / 2]} material={ridgeMat}><cylinderGeometry args={[0.1, 0.1, 10.2, 8]} /></mesh>
+        {/* silk drapes framing the stage, and a valance across the top */}
+        {[-1, 1].map((sd) => (
+          <mesh key={sd} position={[sd * 3.2, 6.22, -1.55]} geometry={drapeGeo} material={sd < 0 ? drapeL : drapeR} raycast={() => null} />
+        ))}
+        <mesh position={[0, 6.24, -1.5]} geometry={valanceGeo} material={valance} raycast={() => null} />
         <Lantern char="春" paper="#d8321e" position={[-3.1, 6.2, -1.3]} size={1.15} drop={0.3} phase={0.5} />
         <Lantern char="福" paper="#d8321e" position={[3.1, 6.2, -1.3]} size={1.15} drop={0.3} phase={1.5} />
         <pointLight position={[0, 5.5, 3.5]} intensity={30} color="#ffd9a0" distance={12} />

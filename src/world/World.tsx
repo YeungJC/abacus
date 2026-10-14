@@ -1,7 +1,10 @@
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
-import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
+import { Bloom, ChromaticAberration, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
+import { BlendFunction } from "postprocessing";
+import * as THREE from "three";
+import { FxClock } from "./Silk";
 import { socName, SOCS } from "../data";
 import { useApp } from "../store";
 import { EmptyLot, EnvelopeStall, GalaStage, Gate, Halls, NoticeBoard, StationExit, TeaHouse } from "./Landmarks";
@@ -51,6 +54,8 @@ function Labels() {
     </>
   );
 }
+
+const CA = new THREE.Vector2(0.0009, 0.0006);
 
 /** Tells the page the street has drawn a few frames, so the loading veil can lift. */
 function Ready({ onReady }: { onReady: () => void }) {
@@ -106,9 +111,13 @@ export default function World({ onReady }: { onReady: () => void }) {
       <Labels />
       <Player />
       <Ready onReady={onReady} />
+      <FxClock />
       <EffectComposer multisampling={quality === "high" ? 4 : 0}>
         <Bloom mipmapBlur luminanceThreshold={0.8} intensity={1.05} radius={0.7} />
+        <ChromaticAberration offset={CA} radialModulation modulationOffset={0.35} />
         <Vignette offset={0.3} darkness={0.75} />
+        {/* film grain, as shadergradient and liquid-logo both finish with */}
+        <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.55} />
       </EffectComposer>
     </Canvas>
   );

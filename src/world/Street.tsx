@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { useApp } from "../store";
 import { lanternGeo } from "./Lantern";
 import People from "./People";
+import { Banner } from "./Silk";
 import { walkToPoint } from "./Player";
 import { buildRow, type Spec } from "./Shophouse";
 import { HALF, STOPS } from "./stops";
@@ -439,6 +440,30 @@ function Fireworks() {
   );
 }
 
+/* ── silk banners ───────────────────────────────── */
+
+const BANNER_CHARS = ["福", "春", "喜", "和", "樂", "安", "壽", "祥", "興", "同"];
+const SILKS: [string, string, string][] = [
+  ["#b3201a", "#f2c46a", "#5a0a0a"], // cinnabar and gold
+  ["#1f5a4c", "#e6c47a", "#0c2a24"], // jade
+  ["#2a3a7a", "#d8c8a0", "#10183a"], // indigo
+  ["#c45a1a", "#ffd890", "#5a1a06"], // persimmon
+  ["#6a1a3a", "#f0b0c0", "#2a0816"], // plum
+];
+
+/** Silk banners hung from short poles along both sides of the street. */
+function Banners() {
+  return (
+    <>
+      {BANNER_CHARS.map((ch, k) => {
+        const side = k % 2 ? 1 : -1;
+        const [c1, c2, c3] = SILKS[k % SILKS.length];
+        return <Banner key={k} char={ch} c1={c1} c2={c2} c3={c3} seed={k * 3.7} position={[side * (HALF - 1.05), 6.7, 21 - k * 6.4]} />;
+      })}
+    </>
+  );
+}
+
 export default function Street({ quality }: { quality: "high" | "low" }) {
   return (
     <>
@@ -448,6 +473,7 @@ export default function Street({ quality }: { quality: "high" | "low" }) {
       <Ripples />
       <Filler />
       <LanternStrings />
+      <Banners />
       <Rain />
       <SkyLanterns />
       <Fireworks />

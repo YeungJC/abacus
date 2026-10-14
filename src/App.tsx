@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import Committees from "./components/Committees";
 import Guide from "./components/Guide";
 import Header, { canWalk } from "./components/Header";
@@ -8,6 +8,7 @@ import Societies from "./components/Societies";
 import Steps from "./components/Steps";
 import WhatsOn from "./components/WhatsOn";
 import { useApp, useT } from "./store";
+import { LiquidGlyph } from "./fx/Liquid";
 import Help from "./ui/Help";
 import MapStrip from "./ui/MapStrip";
 import Prompt from "./ui/Prompt";
@@ -20,6 +21,9 @@ const World = lazy(() => import("./world/World"));
 function Street() {
   const [coarse] = useState(() => matchMedia("(pointer: coarse)").matches);
   const [ready, setReady] = useState(false);
+  // once the veil has faded, take it out of the page so its shader stops running
+  const [veil, setVeil] = useState(true);
+  useEffect(() => { if (ready) { const id = setTimeout(() => setVeil(false), 1800); return () => clearTimeout(id); } }, [ready]);
   const intro = useApp((s) => s.intro);
   const lang = useApp((s) => s.lang);
   return (
@@ -29,10 +33,10 @@ function Street() {
           <World onReady={() => setReady(true)} />
         </Suspense>
       </div>
-      <div className={"veil" + (ready ? " gone" : "")} aria-hidden={ready}>
-        <div className="veil-tong">同</div>
+      {veil && <div className={"veil" + (ready ? " gone" : "")} aria-hidden={ready}>
+        <LiquidGlyph text="同" className="veil-tong" glow={1.4} />
         <p>{lang === "en" ? "Lighting the lanterns…" : lang === "hant" ? "點燈中…" : "点灯中…"}</p>
-      </div>
+      </div>}
       <Header />
       <Prompt />
       <Sheet />

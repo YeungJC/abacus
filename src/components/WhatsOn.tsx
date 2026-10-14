@@ -3,6 +3,7 @@ import { EVENTS, GALA_AT, SOCS, socById, socName } from "../data";
 import { pluck } from "../lib/audio";
 import { fmtDate } from "../lib/dates";
 import { local } from "../lib/storage";
+import { GradientField } from "../fx/Liquid";
 import { useT } from "../store";
 
 const css = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -115,6 +116,7 @@ export function Gala({ onLight }: { onLight: (e: React.MouseEvent<HTMLButtonElem
   const pad = (n: number) => String(n).padStart(2, "0");
   return (
     <div className="gala">
+      <GradientField className="gala-field" c1="#8a0e0a" c2="#e0a040" c3="#3a0406" bg="#5a0806" density={1.8} strength={1.1} />
       <div>
         <span className="eyebrow" style={{ color: "inherit", opacity: 0.8 }}>丁未 · Year of the Goat</span>
         <h3>{t("gala.h")}</h3>

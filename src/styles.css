@@ -630,3 +630,32 @@ footer .wrap { display: flex; gap: 16px; flex-wrap: wrap; justify-content: space
 .sheet-body { background:
   radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--paper-2) 60%, transparent) 0 1px, transparent 1.5px) 0 0 / 9px 11px,
   var(--paper); }
+
+/* ── shader surfaces ───────────────────────────── */
+canvas.veil-tong { width: min(240px, 50vw); height: min(240px, 50vw); display: block; animation: none; }
+canvas.liquid-tong { width: 96px; height: 104px; display: block; flex: none; }
+canvas.hero-glyph { width: clamp(110px, 16vw, 168px); height: clamp(120px, 17vw, 180px); }
+.page-hero { isolation: isolate; }
+.hero-field { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; display: block; }
+.page-hero .hero-inner { position: relative; }
+.gala { isolation: isolate; }
+.gala-field { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; display: block; }
+.gala > div { position: relative; }
+
+/* ── top bar over the street: one frosted capsule ── */
+.bar-world .tools {
+  gap: 2px; padding: 4px; border-radius: 999px;
+  background: rgba(14, 9, 20, .5); border: 1px solid var(--glass-line);
+  backdrop-filter: blur(12px) saturate(1.2); -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .35);
+}
+.bar-world .seg { border: 0; background: none; border-radius: 999px; }
+.bar-world .seg button { border-radius: 999px; padding: 5px 11px; transition: background .2s, color .2s; }
+.bar-world .seg button:not([aria-pressed="true"]):hover { background: rgba(244, 230, 198, .1); }
+.bar-world .icon-btn { border: 0; background: none; border-radius: 999px; padding: 5px 12px; transition: background .2s, color .2s; }
+.bar-world .icon-btn:hover { background: rgba(244, 230, 198, .1); }
+.bar-world .icon-btn[aria-pressed="true"] { background: rgba(196, 41, 30, .85); color: #fff6e6; }
+.bar-world .tools > * + * { box-shadow: -1px 0 0 var(--glass-line); margin-left: 3px; }
+.bar-world .logo { padding: 4px 12px 4px 4px; border-radius: 999px; background: rgba(14, 9, 20, .35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.bar-world .logo .seal { border-radius: 50%; }
+.bar-world .logo b { letter-spacing: .06em; }
